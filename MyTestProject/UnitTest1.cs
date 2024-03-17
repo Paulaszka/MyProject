@@ -12,7 +12,8 @@ namespace MyTestProject
         [Test]
         public void Test1()
         {
-            Assert.Pass();
+            Assert.AreEqual(5, App.funkcja(2, 3));
+               
         }
     }
 }

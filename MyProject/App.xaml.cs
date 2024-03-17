@@ -9,6 +9,12 @@ namespace MyProject
     /// </summary>
     public partial class App : Application
     {
+        
+        public static int funkcja(int a, int b)
+        {
+            return a + b;
+        }
+
     }
 
 }
