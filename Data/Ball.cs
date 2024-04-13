@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 
 namespace Data
 {
@@ -17,18 +13,30 @@ namespace Data
             y = _y;
         }
 
-        public override double getX() { return x; }
-
-        public override double getY() { return y; }
-
-        public override void setX(double _x)
+        public double posX
         {
-            x = _x;
+            get
+            {
+                return x;
+            }
+            set
+            {
+                x = value;
+            }
         }
 
-        public override void setY(double _y)
+        public double posY
         {
-            y = _y;
+            get
+            {
+                return y;
+            }
+            set
+            {
+                y = value;
+            }
         }
+
+
     }
 }
