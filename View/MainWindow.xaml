@@ -3,10 +3,107 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:View"
+        xmlns:local="clr-namespace:View" xmlns:vm="clr-namespace:ViewModel;assembly=ViewModel"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="Bilard" Height="860" Width="840"
+        MinHeight="760" MinWidth="720"
+        Background="HotPink">
+    <Window.DataContext>
+        <vm:Controls/>
+    </Window.DataContext>
+    <Viewbox Stretch="Fill"
+           Width="720"
+           Height="720">
 
-    </Grid>
+        <StackPanel Orientation="Vertical">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="60*"/>
+                    <ColumnDefinition Width="20*"/>
+                    <ColumnDefinition Width="40*"/>
+                    <ColumnDefinition Width="90*"/>
+                    <ColumnDefinition Width="100*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Content="+" 
+                    Command="{Binding AddBallButtonClick}"
+                    FontSize="20" 
+                    
+                    Foreground="White"
+                    HorizontalAlignment="Left" 
+                    Grid.Column="2" 
+                    VerticalAlignment="Center" 
+                    Background="Maroon" 
+                    Height="30"
+                    Width="100"
+                    BorderBrush="White" 
+                    Grid.ColumnSpan="2" Margin="143,0,0,0"/>
+
+                <Button Content="-" 
+                    Command="{Binding RemoveBallButtonClick}"
+                    FontSize="20" 
+                     
+                    Foreground="White"
+                    HorizontalAlignment="Left" 
+                    Background="Maroon" 
+                    Width="100"
+                    BorderBrush="White" FontFamily="Arial"/>
+
+                <TextBox HorizontalAlignment="Left" 
+                     BorderBrush="White"
+                     Grid.Column="2"
+                     TextAlignment="Center"
+                     FontSize="24"
+                     TextWrapping="Wrap" 
+                     Text="{Binding BallAmountText}" 
+                     VerticalAlignment="Center" 
+                     Width="100"
+                     Height="30"
+                     Background="Maroon"
+                     Foreground="White"
+                     FontFamily="Arial"
+                     />
+
+                <Button Content="Play" 
+                    Command="{Binding CreateBallsButtonClick}"
+                    FontSize="15" 
+
+                    Foreground="White"
+                    HorizontalAlignment="Left" 
+                
+                    Grid.Column="4" 
+                    Background="MediumVioletRed" 
+                    Width="200"
+                    BorderBrush="White" Margin="10,0,0,0" Click="Button_Click"/>
+
+
+            </Grid>
+            <Canvas x:Name="canvasArea" Width="700" Height="700" Background="LightPink"/>
+
+            <ItemsControl x:Name="ic" ItemsSource="{Binding ObsBallCollection}">
+                <ItemsControl.Resources>
+                    <DataTemplate DataType="{x:Type vm:Ball}">
+                        <Ellipse Fill="LavenderBlush" Stroke="LavenderBlush" StrokeThickness="1" Width="40" Height="40"/>
+                    </DataTemplate>
+                </ItemsControl.Resources>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemContainerStyle>
+                    <Style TargetType="{x:Type ContentPresenter}">
+                        <Setter Property="Canvas.Left" Value="{Binding XPos}"/>
+                        <Setter Property="Canvas.Bottom" Value="{Binding YPos}"/>
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
+            </ItemsControl>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="100"/>
+                </Grid.RowDefinitions>
+            </Grid>
+        </StackPanel>
+    </Viewbox>
 </Window>

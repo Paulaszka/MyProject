@@ -17,7 +17,7 @@ namespace Logic
 
         public abstract DataAPI GetDataAPI();
 
-        public static LogicAPI CreateObjLogic(DataAPI data = default(DataAPI))
+        public static LogicAPI CreateObjLogic(DataAPI data = default)
         {
             return new Logic();
         }

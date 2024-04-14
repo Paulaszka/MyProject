@@ -9,17 +9,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyTestProject", "MyTestProj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Model", "Model\Model.csproj", "{FF238BB0-778E-4196-BD25-9317DED43787}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logic", "Logic\Logic.csproj", "{878286E2-410D-4F61-8618-6A82CC3F9D9D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logic", "Logic\Logic.csproj", "{878286E2-410D-4F61-8618-6A82CC3F9D9D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data", "Data\Data.csproj", "{1D9201D6-CF3E-49E9-AE89-A9761ADE28D2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Data", "Data\Data.csproj", "{1D9201D6-CF3E-49E9-AE89-A9761ADE28D2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ViewModel", "ViewModel\ViewModel.csproj", "{34FBC248-E7AE-465D-BDAB-E943E2541C47}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ViewModel", "ViewModel\ViewModel.csproj", "{34FBC248-E7AE-465D-BDAB-E943E2541C47}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataTest", "DataTest\DataTest.csproj", "{BD8B6DDF-945A-4E87-A1BC-27F20ECF5DC6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataTest", "DataTest\DataTest.csproj", "{BD8B6DDF-945A-4E87-A1BC-27F20ECF5DC6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogicTest", "LogicTest\LogicTest.csproj", "{631323AB-F2D6-4B9F-949D-5FB821FE81B7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogicTest", "LogicTest\LogicTest.csproj", "{631323AB-F2D6-4B9F-949D-5FB821FE81B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "View", "View\View.csproj", "{D7CEBBF2-3683-4127-8539-B27E9B22E015}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "View", "View\View.csproj", "{D7CEBBF2-3683-4127-8539-B27E9B22E015}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

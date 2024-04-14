@@ -4,16 +4,16 @@ namespace Data
 {
     internal class Ball : DataAPI
     {
-        private double x;
-        private double y;
-
         public Ball(double _x, double _y)
         {
             x = _x;
             y = _y;
         }
 
-        public double posX
+        private double x;
+        private double y;
+
+        public override double posX
         {
             get
             {
@@ -25,7 +25,7 @@ namespace Data
             }
         }
 
-        public double posY
+        public override double posY
         {
             get
             {
@@ -36,7 +36,5 @@ namespace Data
                 y = value;
             }
         }
-
-
     }
 }

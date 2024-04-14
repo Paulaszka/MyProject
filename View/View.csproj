@@ -4,8 +4,12 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+	<RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\ViewModel\ViewModel.csproj" />
+  </ItemGroup>
 
 </Project>

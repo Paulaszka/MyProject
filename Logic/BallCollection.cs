@@ -4,7 +4,7 @@ namespace Logic
 {
     internal class BallCollection : BallCollectionAPI
     {
-        List<LogicAPI> ballCollection;
+        List<LogicAPI>? ballCollection;
 
         public override void CreateBallCollection(int size)
         {
@@ -12,7 +12,7 @@ namespace Logic
 
             for (int i = 0; i < size; i++)
             {
-                Logic ball = new Logic();
+                LogicAPI ball = new Logic();
                 ballCollection.Add(ball.CreateBall());
             }
         }

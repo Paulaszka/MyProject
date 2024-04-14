@@ -7,8 +7,8 @@
             return new Ball(x, y);
         }
 
-        public double X;
+        public virtual double posX { get; set; }
 
-        public double Y;
+        public virtual double posY { get; set; }
     }
 }
