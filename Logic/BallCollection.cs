@@ -1,6 +1,4 @@
-﻿
-
-namespace Logic
+﻿namespace Logic
 {
     internal class BallCollection : BallCollectionAPI
     {
