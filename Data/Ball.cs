@@ -31,6 +31,7 @@ namespace Data
         private readonly Stopwatch stopwatch = new Stopwatch();
         private Task task;
         private bool stop = false;
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public Ball(int id, int size, Vector2 position, Vector2 newPosition, Vector2 velocity, double weight)
         {
@@ -40,6 +41,54 @@ namespace Data
             this.newPosition = newPosition;
             this.velocity = velocity;
             this.weight = weight;
+        }
+
+        internal void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public void ballMove()
+        {
+            BallPosition += Velocity;
+        }
+
+        public void ballCreateMovementTask(int interval)
+        {
+            stop = false;
+            task = Run(interval);
+        }
+
+        private async Task Run(int interval)
+        {
+            while (!stop)
+            {
+                stopwatch.Reset();
+                stopwatch.Start();
+
+                if (!stop)
+                    ballMove();
+
+                stopwatch.Stop();
+                await Task.Delay((int)(interval - stopwatch.ElapsedMilliseconds));
+            }
+        }
+
+        public void ballStop()
+        {
+            stop = true;
+        }
+
+        public float BallPositionX
+        {
+            get => BallPosition.X;
+
+        }
+
+        public float BallPositionY
+        {
+            get => BallPosition.Y;
+
         }
 
         public int BallId => id;
@@ -81,56 +130,6 @@ namespace Data
 
                 velocity = value;
             }
-        }
-
-        public void ballMove()
-        {
-            BallPosition += Velocity;
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        internal void RaisePropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public void ballCreateMovementTask(int interval)
-        {
-            stop = false;
-            task = Run(interval);
-        }
-
-        private async Task Run(int interval)
-        {
-            while (!stop)
-            {
-                stopwatch.Reset();
-                stopwatch.Start();
-
-                if (!stop)
-                    ballMove();
-
-                stopwatch.Stop();
-                await Task.Delay((int)(interval - stopwatch.ElapsedMilliseconds));
-            }
-        }
-
-        public void ballStop()
-        {
-            stop = true;
-        }
-
-        public float BallPositionX
-        {
-            get => BallPosition.X;
-
-        }
-
-        public float BallPositionY
-        {
-            get => BallPosition.Y;
-
         }
     }
 }
