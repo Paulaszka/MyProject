@@ -11,6 +11,7 @@ namespace Data
         private Vector2 velocity;
         private readonly int size;
         private readonly double weight;
+		private int ballId;
 
 
         public Ball(int size, Vector2 position, Vector2 newPosition, Vector2 velocity, double weight)
@@ -60,6 +61,7 @@ namespace Data
 
         public int BallSize => size;
         public double BallWeight => weight;
+		public int BallId => id;
 
         public float BallPositionX
         {

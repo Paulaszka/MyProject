@@ -15,6 +15,7 @@ namespace Data
         public Vector2 Velocity { get; set; }
         public float BallPositionX { get; set; }
         public float BallPositionY { get; set; }
+		public int BallId { get; }
 
     }
 }
