@@ -1,21 +1,43 @@
-﻿using System.Drawing;
-using System.Numerics;
+﻿using System.Collections.ObjectModel;
 
 namespace Data
 {
-    public abstract class DataAPI
+    public abstract class DataAbstractAPI
     {
-        /*public static DataAPI CreateBall(double x, double y)
+        public abstract int getAmount { get; }
+        public abstract int width { get; }
+        public abstract int height { get; }
+        public abstract IBall getBall(int index);
+
+        public static DataAbstractAPI createAPI(int width, int height)
         {
-            return new Ball(x, y);
-        }*/
+            return new DataAPI(width, height);
+        }
+    }
 
-        public Vector2 BallPosition { get; set; }
-        public Vector2 BallNewPosition { get; set; }
-        public Vector2 Velocity { get; set; }
-        public float BallPositionX { get; set; }
-        public float BallPositionY { get; set; }
-		public int BallId { get; }
+    internal class DataAPI : DataAbstractAPI
+    {
+        private ObservableCollection<IBall> balls { get; }
+        
+        private readonly Random random = new Random();
 
+        public override int width { get; }
+        public override int height { get; }
+
+        public DataAPI(int width, int height)
+        {
+            balls = new ObservableCollection<IBall>();
+            this.width = width;
+            this.height = height;
+        }
+
+        public ObservableCollection<IBall> Balls => balls;
+
+        public override int getAmount { get => balls.Count; }
+
+        public override IBall getBall(int index)
+        {
+            return balls[index];
+        }
     }
 }
