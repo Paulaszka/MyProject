@@ -18,6 +18,7 @@ namespace Logic
         public abstract void Bounce(IBall ball);
         public abstract void ChangeBallPosition(object sender, PropertyChangedEventArgs args);
 
+
         public static LogicAbstractAPI CreateApi(int width, int height, DataAbstractAPI dataAbstractAPI = default(DataAbstractAPI))
         {
             if (dataAbstractAPI == null)
@@ -25,6 +26,7 @@ namespace Logic
                 dataAbstractAPI = DataAbstractAPI.CreateApi(width, height);
             }
             return new LogicAPI(width, height, dataAbstractAPI);
+
         }
     }
 

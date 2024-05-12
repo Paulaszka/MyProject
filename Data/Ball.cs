@@ -32,6 +32,7 @@ namespace Data
         private bool stop = false;
 
         public Ball(int id, int size, float x, float y, Vector2 velocity,  double weight)
+
         {
             this.id = id;
             this.size = size;
