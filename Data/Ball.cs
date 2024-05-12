@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace Data
 {
@@ -10,50 +10,85 @@ namespace Data
         int BallId { get; }
         int BallSize { get; }
         double BallWeight { get; }
-
-        Vector2 BallPosition { get; set; }
-        Vector2 BallNewPosition { get; set; }
+        float BallPositionX { get; set; }
+        float BallPositionY { get; set; }
         Vector2 Velocity { get; set; }
 
-        void ballMove();
-        void ballCreateMovementTask(int interval);
-        void ballStop();
+        void BallMove();
+        void BallCreateMovementTask(int interval);
+        void BallStop();
     }
 
     internal class Ball : IBall
     {
-        private Vector2 position;
-        private Vector2 newPosition;
         private Vector2 velocity;
-        private readonly int id;
         private readonly int size;
+        private readonly int id;
+        private float x;
+        private float y;
         private readonly double weight;
         private readonly Stopwatch stopwatch = new Stopwatch();
         private Task task;
         private bool stop = false;
-        public event PropertyChangedEventHandler PropertyChanged;
 
-        public Ball(int id, int size, Vector2 position, Vector2 newPosition, Vector2 velocity, double weight)
+        public Ball(int id, int size, float x, float y, Vector2 velocity,  double weight)
         {
             this.id = id;
             this.size = size;
-            this.position = position;
-            this.newPosition = newPosition;
+            this.x = x;
+            this.y = y;
             this.velocity = velocity;
             this.weight = weight;
         }
+
+        public int BallId { get => id; }
+        public int BallSize { get => size; }
+
+        public float BallPositionX
+        {
+            get => x;
+            set
+            {
+                if (value.Equals(x))
+                {
+                    return;
+                }
+
+                x = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public float BallPositionY
+        {
+            get => y;
+            set
+            {
+                if (value.Equals(y))
+                {
+                    return;
+                }
+
+                y = value;
+                RaisePropertyChanged();
+            }
+        }
+        public void BallMove()
+        {
+            BallPositionX += velocity.X;
+            BallPositionY += velocity.Y;
+        }
+
+        public double BallWeight { get => weight; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         internal void RaisePropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public void ballMove()
-        {
-            BallPosition += Velocity;
-        }
-
-        public void ballCreateMovementTask(int interval)
+        public void BallCreateMovementTask(int interval)
         {
             stop = false;
             task = Run(interval);
@@ -65,59 +100,18 @@ namespace Data
             {
                 stopwatch.Reset();
                 stopwatch.Start();
-
                 if (!stop)
-                    ballMove();
-
+                {
+                    BallMove();
+                }
                 stopwatch.Stop();
                 await Task.Delay((int)(interval - stopwatch.ElapsedMilliseconds));
             }
         }
 
-        public void ballStop()
+        public void BallStop()
         {
             stop = true;
-        }
-
-        public float BallPositionX
-        {
-            get => BallPosition.X;
-
-        }
-
-        public float BallPositionY
-        {
-            get => BallPosition.Y;
-
-        }
-
-        public int BallId => id;
-        public int BallSize => size;
-        public double BallWeight => weight;
-
-        public Vector2 BallPosition
-        {
-            get => position;
-            set
-            {
-                if (value.Equals(position))
-                    return;
-
-                position = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        public Vector2 BallNewPosition
-        {
-            get => newPosition;
-            set
-            {
-                if (value.Equals(newPosition))
-                    return;
-
-                newPosition = value;
-            }
         }
 
         public Vector2 Velocity

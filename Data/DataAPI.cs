@@ -6,13 +6,13 @@ namespace Data
 {
     public abstract class DataAbstractAPI
     {
-        public abstract int getAmount { get; }
-        public abstract IList createBallsList(int count);
-        public abstract int width { get; }
-        public abstract int height { get; }
-        public abstract IBall getBall(int index);
+        public abstract int GetAmount { get; }
+        public abstract IList CreateBallsList(int count);
+        public abstract int Width { get; }
+        public abstract int Height { get; }
+        public abstract IBall GetBall(int index);
 
-        public static DataAbstractAPI createAPI(int width, int height)
+        public static DataAbstractAPI CreateApi(int width, int height)
         {
             return new DataAPI(width, height);
         }
@@ -20,21 +20,21 @@ namespace Data
 
     internal class DataAPI : DataAbstractAPI
     {
+        private ObservableCollection<IBall> balls { get; }
         private readonly Mutex mutex = new Mutex();
         private readonly Random random = new Random();
 
-        private ObservableCollection<IBall> balls { get; }
-        public override int width { get; }
-        public override int height { get; }
+        public override int Width { get; }
+        public override int Height { get; }
 
         public DataAPI(int width, int height)
         {
             balls = new ObservableCollection<IBall>();
-            this.width = width;
-            this.height = height;
+            this.Width = width;
+            this.Height = height;
         }
 
-        public override IList createBallsList(int count)
+        public override IList CreateBallsList(int count)
         {
             if (count > 0)
             {
@@ -43,21 +43,19 @@ namespace Data
                 {
                     mutex.WaitOne();
                     int r = 20;
-                    double weight = 30;
-                    double x = random.Next(r, width - r);
-                    double y = random.Next(r, height - r);
-                    double newX = random.Next(-10, 10) + random.NextDouble();
-                    double newY = random.Next(-10, 10) + random.NextDouble();
-                    Vector2 position = new Vector2((float)x, (float)y);
-                    Vector2 newPosition = new Vector2((float)newX, (float)newY);
-                    Vector2 velocity = new Vector2(10, 10);
-                    Ball ball = new Ball(i + 1 + ballsCount, r, position, newPosition, velocity, weight);
+                    int pom = random.Next(20, 40);
+                    double weight = pom;
+                    float x = random.Next(r, Width - r);
+                    float y = random.Next(r, Height - r);
+                    Vector2 velocity = new Vector2(5, 5);
+                    Ball ball = new Ball(i + 1 + ballsCount, r, x, y, velocity, weight);
 
                     balls.Add(ball);
                     mutex.ReleaseMutex();
+
                 }
             }
-            else if (count < 0)
+            if (count < 0)
             {
                 for (int i = count; i < 0; i++)
                 {
@@ -66,17 +64,17 @@ namespace Data
                         mutex.WaitOne();
                         balls.Remove(balls[balls.Count - 1]);
                         mutex.ReleaseMutex();
-                    }
+                    };
                 }
             }
             return balls;
+
         }
 
         public ObservableCollection<IBall> Balls => balls;
+        public override int GetAmount { get => balls.Count; }
 
-        public override int getAmount { get => balls.Count; }
-
-        public override IBall getBall(int index)
+        public override IBall GetBall(int index)
         {
             return balls[index];
         }

@@ -9,21 +9,24 @@ namespace ViewModel
 
         public event EventHandler? CanExecuteChanged;
         public Commands(Action execute) : this(execute, null) { }
+
         public Commands(Action execute, Func<bool> canExecute)
         {
             this.execute = execute ?? throw new ArgumentNullException(nameof(execute));
             this.canExecute = canExecute;
         }
 
+
+
         public bool CanExecute(object parameter)
         {
             if (canExecute == null) return true;
             if (parameter == null) return canExecute();
-            return canExecute();
 
+            return canExecute();
         }
 
-        public void Execute(object parameter)
+        public virtual void Execute(object parameter)
         {
             this.execute();
         }

@@ -5,22 +5,18 @@ namespace DataTest
     [TestClass]
     public class DataAPITest
     {
+        
         [TestMethod]
         public void ConstructorTest()
         {
-            DataAPI ball = DataAPI.CreateBall(7,1);
-            Assert.AreEqual(ball.posX, 7);
-            Assert.AreEqual(ball.posY, 1);
-        }
-
-        [TestMethod]
-        public void SetterTest()
-        {
-            DataAPI ball = DataAPI.CreateBall(7, 6);
-            ball.posX = 1;
-            ball.posY = 2;
-            Assert.AreEqual(ball.posX, 1);
-            Assert.AreEqual(ball.posY, 2);
+            DataAbstractAPI dataAbstractAPI = DataAbstractAPI.CreateApi(100, 100);
+            dataAbstractAPI.CreateBallsList(5);
+            Assert.AreEqual(3, dataAbstractAPI.GetBall(2).BallId);
+            Assert.AreEqual(5, dataAbstractAPI.GetAmount);
+            dataAbstractAPI.CreateBallsList(-3);
+            Assert.AreEqual(2, dataAbstractAPI.GetAmount);
+            dataAbstractAPI.CreateBallsList(-3);
+            Assert.AreEqual(0, dataAbstractAPI.GetAmount);
         }
     }
 }
