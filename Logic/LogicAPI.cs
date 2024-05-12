@@ -17,9 +17,17 @@ namespace Logic
 
         public abstract DataAPI GetDataAPI();
 
-        public static LogicAPI CreateObjLogic(DataAPI data = default)
+        public static LogicAPI CreateObjLogic(DataAPI data = default(DataAPI))
         {
-            return new Logic();
+            if (data == null)
+            {
+                Random r = new Random();
+                int x = r.Next(20, 680);
+                r = new Random();
+                int y = r.Next(20, 680);
+                data = DataAPI.CreateBall(x,y);
+            }
+            return new Logic(data);
         }
     }
 }

@@ -10,7 +10,7 @@
 
             for (int i = 0; i < size; i++)
             {
-                LogicAPI ball = new Logic();
+                LogicAPI ball = LogicAPI.CreateObjLogic();
                 ballCollection.Add(ball.CreateBall());
             }
         }

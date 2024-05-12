@@ -10,10 +10,10 @@ namespace Logic
 
         private DataAPI data;
 
-        public Logic()
+        public Logic(DataAPI dataAPI)
         {
             Vector2 cords = PutBall();
-            data = DataAPI.CreateBall(cords.X, cords.Y);
+            data = dataAPI;
         }
 
         public override DataAPI GetDataAPI()

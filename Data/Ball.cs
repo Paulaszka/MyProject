@@ -4,7 +4,7 @@ namespace Data
 {
     internal class Ball : DataAPI
     {
-        public Ball(double _x, double _y)
+        public Ball(double _x = default(double), double _y = default(double))
         {
             x = _x;
             y = _y;
