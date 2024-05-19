@@ -7,12 +7,9 @@ namespace Data
     public abstract class DataAbstractAPI
     {
         public abstract int GetAmount { get; }
-
         public abstract IList CreateBallsList(int count);
-
         public abstract int Width { get; }
         public abstract int Height { get; }
-
         public abstract IBall GetBall(int index);
 
         public static DataAbstractAPI CreateApi(int width, int height)
@@ -50,12 +47,12 @@ namespace Data
                     double weight = pom;
                     float x = random.Next(r, Width - r);
                     float y = random.Next(r, Height - r);
-                    Position position = new Position((float)x, (float)y);
                     Vector2 velocity = new Vector2(5, 5);
-                    Ball ball = new Ball(i + 1 + ballsCount, r, position, velocity, weight);
+                    Ball ball = new Ball(i + 1 + ballsCount, r, x, y, velocity, weight);
 
                     balls.Add(ball);
                     mutex.ReleaseMutex();
+
                 }
             }
             if (count < 0)
@@ -71,6 +68,7 @@ namespace Data
                 }
             }
             return balls;
+
         }
 
         public ObservableCollection<IBall> Balls => balls;

@@ -8,22 +8,14 @@ namespace Logic
     public abstract class LogicAbstractAPI
     {
         public abstract int GetAmount { get; }
-
         public abstract IList CreateBalls(int count);
-
         public abstract void Start();
-
         public abstract void Stop();
-
         public abstract int width { get; set; }
         public abstract int height { get; set; }
-
         public abstract IBall GetBall(int index);
-
         public abstract void CollisionWithWall(IBall ball);
-
         public abstract void Bounce(IBall ball);
-
         public abstract void ChangeBallPosition(object sender, PropertyChangedEventArgs args);
 
         public static LogicAbstractAPI CreateApi(int width, int height, DataAbstractAPI dataAbstractAPI = default(DataAbstractAPI))
@@ -73,24 +65,24 @@ namespace Logic
             float right = width - diameter;
             float down = height - diameter;
 
-            if (ball.BallPosition.X <= 0)
+            if (ball.BallPositionX <= 0)
             {
-                ball.BallPosition.SetPosition(-ball.BallPosition.X, ball.BallPosition.Y);
+                ball.BallPositionX = -ball.BallPositionX;
                 ball.Velocity = new Vector2(-ball.Velocity.X, ball.Velocity.Y);
             }
-            else if (ball.BallPosition.X >= right)
+            else if (ball.BallPositionX >= right)
             {
-                ball.BallPosition.SetPosition(right - (ball.BallPosition.X - right), ball.BallPosition.Y);
+                ball.BallPositionX = right - (ball.BallPositionX - right);
                 ball.Velocity = new Vector2(-ball.Velocity.X, ball.Velocity.Y);
             }
-            if (ball.BallPosition.Y <= 0)
+            if (ball.BallPositionY <= 0)
             {
-                ball.BallPosition.SetPosition(ball.BallPosition.X, -ball.BallPosition.Y);
+                ball.BallPositionY = -ball.BallPositionY;
                 ball.Velocity = new Vector2(ball.Velocity.X, -ball.Velocity.Y);
             }
-            else if (ball.BallPosition.Y >= down)
+            else if (ball.BallPositionY >= down)
             {
-                ball.BallPosition.SetPosition(ball.BallPosition.X, down - (ball.BallPosition.Y - down));
+                ball.BallPositionY = down - (ball.BallPositionY - down);
                 ball.Velocity = new Vector2(ball.Velocity.X, -ball.Velocity.Y);
             }
         }
@@ -134,10 +126,10 @@ namespace Logic
 
         internal double Distance(IBall a, IBall b)
         {
-            double x1 = a.BallPosition.X + a.BallSize / 2 + a.Velocity.X;
-            double y1 = a.BallPosition.Y + a.BallSize / 2 + a.Velocity.Y;
-            double x2 = b.BallPosition.X + b.BallSize / 2 + b.Velocity.X;
-            double y2 = b.BallPosition.Y + b.BallSize / 2 + b.Velocity.Y;
+            double x1 = a.BallPositionX + a.BallSize / 2 + a.Velocity.X;
+            double y1 = a.BallPositionY + a.BallSize / 2 + a.Velocity.Y;
+            double x2 = b.BallPositionX + b.BallSize / 2 + b.Velocity.X;
+            double y2 = b.BallPositionY + b.BallSize / 2 + b.Velocity.Y;
             return Math.Sqrt((Math.Pow(x1 - x2, 2) + Math.Pow(y1 - y2, 2)));
         }
 

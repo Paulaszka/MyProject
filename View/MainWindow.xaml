@@ -6,75 +6,33 @@
         xmlns:vm="clr-namespace:ViewModel;assembly=ViewModel"
         xmlns:local="clr-namespace:View"
         mc:Ignorable="d"
-        Title="Bilard"
-        Height="800"
-        Width="1000"
-        Background="#c35b8f">
+        Title="Bilard" Height="800" Width="1000" Background="#c35b8f" >
 
     <Window.DataContext>
-        <vm:MainWindowViewModel />
+        <vm:MainWindowViewModel/>
     </Window.DataContext>
 
+
     <Grid>
-        <Canvas Width="{Binding Width}"
-                Height="{Binding Height}"
-                Background="#de9dbe">
-            <ItemsControl Name="Balls"
-                          ItemsSource="{Binding Balls}">
+        <Canvas Width="{Binding Width}" Height="{Binding Height}" Background="#de9dbe">
+            <ItemsControl Name="Balls" ItemsSource="{Binding Balls}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Canvas>
-                            <Ellipse Stroke="#aa4465"
-                                     Fill="#e8d5df"
-                                     Width="{Binding BallSize}"
-                                     Height="{Binding BallSize}"
-                                     Canvas.Left="{Binding BallPosition.X}"
-                                     Canvas.Top="{Binding BallPosition.Y}" />
+                            <Ellipse Stroke="#aa4465" Fill="#e8d5df"  Width="{Binding BallSize}" Height="{Binding BallSize}" Canvas.Left="{Binding BallPositionX}" Canvas.Top="{Binding BallPositionY}"/>
                         </Canvas>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-            <Border BorderBrush="#aa4465"
-                    BorderThickness="5,5,5,5"
-                    Height="{Binding Height}"
-                    Width="{Binding Width}"
-                    VerticalAlignment="Top">
+            <Border BorderBrush="#aa4465" BorderThickness="5,5,5,5" Height="{Binding Height}" Width="{Binding Width}" VerticalAlignment="Top">
             </Border>
         </Canvas>
-        <StackPanel Orientation="Horizontal"
-                    VerticalAlignment="Top"
-                    HorizontalAlignment="Center">
-            <Button Content="START"
-                    FontSize="40"
-                    Width="200"
-                    Command="{Binding RunCommand}"
-                    IsEnabled="{Binding IsRunEnabled}" />
-            <Button x:Name="StopButton"
-                    Content="STOP"
-                    FontSize="40"
-                    VerticalContentAlignment="Center"
-                    Width="200"
-                    Command="{Binding StopCommand}"
-                    IsEnabled="{Binding IsStopEnabled}" />
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Center">
+            <Button Content="START" FontSize="40" Width="200" Command="{Binding RunCommand}" IsEnabled="{Binding IsRunEnabled}" />
+            <Button x:Name="StopButton" Content="STOP" FontSize="40"  VerticalContentAlignment="Center" Width="200" Command="{Binding StopCommand}" IsEnabled="{Binding IsStopEnabled}" />
             <StackPanel Orientation="Vertical">
-                <TextBox Background="#e8d5df"
-                         Foreground="#777777"
-                         TextWrapping="Wrap"
-                         Text="{Binding BallValue}"
-                         Width="100"
-                         Height="30"
-                         TextAlignment="Center"
-                         FontSize="20px" />
-                <Button x:Name="AddButton"
-                        Background="#e8d5df"
-                        Foreground="#777777"
-                        BorderBrush="#aeabb2"
-                        Width="100"
-                        Height="30"
-                        Content="ADD"
-                        FontSize="20"
-                        Command="{Binding AddCommand}"
-                        IsEnabled="{Binding IsAddEnabled}" />
+                <TextBox Background="#e8d5df" Foreground="#777777" TextWrapping="Wrap" Text="{Binding BallValue}" Width="100" Height="30" TextAlignment="Center" FontSize="20px"  />
+                <Button x:Name="AddButton" Background="#e8d5df" Foreground="#777777" BorderBrush="#aeabb2" Width="100" Height="30" Content="ADD" FontSize="20" Command="{Binding AddCommand}" IsEnabled="{Binding IsAddEnabled}" />
             </StackPanel>
         </StackPanel>
     </Grid>

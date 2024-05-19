@@ -5,7 +5,7 @@ namespace DataTest
     [TestClass]
     public class DataAPITest
     {
-        
+
         [TestMethod]
         public void ConstructorTest()
         {
