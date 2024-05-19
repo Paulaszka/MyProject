@@ -18,9 +18,7 @@ namespace Data
         float Y { get; }
 
         void BallMove();
-
         void BallCreateMovementTask(int interval);
-
         void BallStop();
     }
 
@@ -54,12 +52,11 @@ namespace Data
     {
         private readonly int size;
         private readonly int id;
-        private float x;
-        private float y;
         private readonly double weight;
         private readonly Stopwatch stopwatch = new Stopwatch();
         private Task task;
         private bool stop = false;
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public Ball(int id, int size, Position position, Vector2 velocity, double weight)
         {
@@ -72,8 +69,10 @@ namespace Data
 
         public int BallId { get => id; }
         public int BallSize { get => size; }
+        public double BallWeight { get => weight; }
 
         public Position BallPosition { get; set; }
+        public Vector2 Velocity { get; set; }
 
         public float X
         {
@@ -91,19 +90,15 @@ namespace Data
             RaisePropertyChanged(nameof(BallPosition));
         }
 
-        public double BallWeight { get => weight; }
-
         public void BallCreateMovementTask(int interval)
         {
             stop = false;
             task = Run(interval);
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        internal void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+        public void BallStop()
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            stop = true;
         }
 
         private async Task Run(int interval)
@@ -120,12 +115,11 @@ namespace Data
                 await Task.Delay((int)(interval - stopwatch.ElapsedMilliseconds));
             }
         }
-
-        public void BallStop()
+                
+        internal void RaisePropertyChanged([CallerMemberName] string propertyName = null)
         {
-            stop = true;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public Vector2 Velocity { get; set; }
     }
 }

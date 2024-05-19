@@ -1,5 +1,4 @@
-﻿using Data;
-using Logic;
+﻿using Logic;
 using System.Collections;
 
 
@@ -9,8 +8,10 @@ namespace Model
     {
         public abstract int width { get; }
         public abstract int height { get; }
-        public abstract void StartMoving();
+
         public abstract IList Start(int ballVal);
+
+        public abstract void StartMoving();
         public abstract void Stop();
 
         public static ModelAbstractAPI CreateApi(int Width, int Height, LogicAbstractAPI logicAbstractAPI = default(LogicAbstractAPI))
@@ -36,6 +37,8 @@ namespace Model
             this.logicAbstractAPI = logicAbstractAPI;
         }
 
+        public override IList Start(int ballVal) => logicAbstractAPI.CreateBalls(ballVal);
+
         public override void StartMoving()
         {
             logicAbstractAPI.Start();
@@ -46,6 +49,5 @@ namespace Model
             logicAbstractAPI.Stop();
         }
 
-        public override IList Start(int ballVal) => logicAbstractAPI.CreateBalls(ballVal);
     }
 }

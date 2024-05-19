@@ -6,13 +6,11 @@ namespace Data
 {
     public abstract class DataAbstractAPI
     {
+        public abstract int Width { get; }
+        public abstract int Height { get; }
         public abstract int GetAmount { get; }
 
         public abstract IList CreateBallsList(int count);
-
-        public abstract int Width { get; }
-        public abstract int Height { get; }
-
         public abstract IBall GetBall(int index);
 
         public static DataAbstractAPI CreateApi(int width, int height)
@@ -23,12 +21,13 @@ namespace Data
 
     internal class DataAPI : DataAbstractAPI
     {
-        private ObservableCollection<IBall> balls { get; }
-        private readonly Mutex mutex = new Mutex();
-        private readonly Random random = new Random();
-
         public override int Width { get; }
         public override int Height { get; }
+
+        private ObservableCollection<IBall> balls { get; }
+
+        private readonly Mutex mutex = new Mutex();
+        private readonly Random random = new Random();     
 
         public DataAPI(int width, int height)
         {
@@ -37,6 +36,9 @@ namespace Data
             this.Height = height;
         }
 
+        public override int GetAmount { get => balls.Count; }
+        public ObservableCollection<IBall> Balls => balls;
+        
         public override IList CreateBallsList(int count)
         {
             if (count > 0)
@@ -72,9 +74,6 @@ namespace Data
             }
             return balls;
         }
-
-        public ObservableCollection<IBall> Balls => balls;
-        public override int GetAmount { get => balls.Count; }
 
         public override IBall GetBall(int index)
         {

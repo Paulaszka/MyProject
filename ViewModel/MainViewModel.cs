@@ -30,39 +30,6 @@ namespace ViewModel
             RunCommand = new Commands(Start);
         }
 
-        public bool IsStopEnabled
-        {
-            get { return isStopEnabled; }
-            set
-            {
-                isStopEnabled = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        public bool IsRunEnabled
-        {
-            get { return isStartEnabled; }
-            set
-            {
-                isStartEnabled = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        public bool IsAddEnabled
-        {
-            get
-            {
-                return isAddEnabled;
-            }
-            set
-            {
-                isAddEnabled = value;
-                RaisePropertyChanged();
-            }
-        }
-
         public int BallValue
         {
             get
@@ -102,6 +69,54 @@ namespace ViewModel
             }
         }
 
+        public bool IsStopEnabled
+        {
+            get { return isStopEnabled; }
+            set
+            {
+                isStopEnabled = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool IsRunEnabled
+        {
+            get { return isStartEnabled; }
+            set
+            {
+                isStartEnabled = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool IsAddEnabled
+        {
+            get
+            {
+                return isAddEnabled;
+            }
+            set
+            {
+                isAddEnabled = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public IList Balls
+        {
+            get => balls;
+            set
+            {
+                if (value.Equals(balls))
+                {
+                    return;
+                }
+
+                balls = value;
+                RaisePropertyChanged();
+            }
+        }
+
         private void AddBalls()
         {
             size += BallValue;
@@ -134,19 +149,5 @@ namespace ViewModel
             modelAbstractAPI.StartMoving();
         }
 
-        public IList Balls
-        {
-            get => balls;
-            set
-            {
-                if (value.Equals(balls))
-                {
-                    return;
-                }
-
-                balls = value;
-                RaisePropertyChanged();
-            }
-        }
     }
 }

@@ -1,31 +1,24 @@
 ﻿using Data;
 using System.Collections;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Numerics;
 
 namespace Logic
 {
     public abstract class LogicAbstractAPI
     {
-        public abstract int GetAmount { get; }
-
-        public abstract IList CreateBalls(int count);
-
-        public abstract void Start();
-
-        public abstract void Stop();
-
         public abstract int width { get; set; }
         public abstract int height { get; set; }
+        public abstract int GetAmount { get; }
 
-        public abstract IBall GetBall(int index);
-
+        public abstract void Start();
+        public abstract void Stop();
         public abstract void CollisionWithWall(IBall ball);
-
         public abstract void Bounce(IBall ball);
-
         public abstract void ChangeBallPosition(object sender, PropertyChangedEventArgs args);
+
+        public abstract IList CreateBalls(int count);
+        public abstract IBall GetBall(int index);
 
         public static LogicAbstractAPI CreateApi(int width, int height, DataAbstractAPI dataAbstractAPI = default(DataAbstractAPI))
         {
@@ -39,6 +32,9 @@ namespace Logic
 
     internal class LogicAPI : LogicAbstractAPI
     {
+        public override int width { get; set; }
+        public override int height { get; set; }
+
         private readonly DataAbstractAPI dataAbstractAPI;
         private readonly Mutex mutex = new Mutex();
 
@@ -49,8 +45,7 @@ namespace Logic
             this.height = height;
         }
 
-        public override int width { get; set; }
-        public override int height { get; set; }
+        public override int GetAmount { get => dataAbstractAPI.GetAmount; }
 
         public override void Start()
         {
@@ -142,6 +137,15 @@ namespace Logic
             return Math.Sqrt((Math.Pow(x1 - x2, 2) + Math.Pow(y1 - y2, 2)));
         }
 
+        public override void ChangeBallPosition(object sender, PropertyChangedEventArgs args)
+        {
+            IBall ball = (IBall)sender;
+            mutex.WaitOne();
+            CollisionWithWall(ball);
+            Bounce(ball);
+            mutex.ReleaseMutex();
+        }
+
         public override IList CreateBalls(int count)
         {
             int previousCount = dataAbstractAPI.GetAmount;
@@ -153,20 +157,10 @@ namespace Logic
             return temp;
         }
 
-        public override void ChangeBallPosition(object sender, PropertyChangedEventArgs args)
-        {
-            IBall ball = (IBall)sender;
-            mutex.WaitOne();
-            CollisionWithWall(ball);
-            Bounce(ball);
-            mutex.ReleaseMutex();
-        }
-
         public override IBall GetBall(int index)
         {
             return dataAbstractAPI.GetBall(index);
         }
 
-        public override int GetAmount { get => dataAbstractAPI.GetAmount; }
     }
 }
