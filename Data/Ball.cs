@@ -10,18 +10,48 @@ namespace Data
         int BallId { get; }
         int BallSize { get; }
         double BallWeight { get; }
-        float BallPositionX { get; set; }
-        float BallPositionY { get; set; }
+
+        Position BallPosition { get; set; }
         Vector2 Velocity { get; set; }
 
+        float X { get; }
+        float Y { get; }
+
         void BallMove();
+
         void BallCreateMovementTask(int interval);
+
         void BallStop();
+    }
+
+    public interface IPosition
+    {
+        float X { get; set; }
+        float Y { get; set; }
+
+        void SetPosition(float x, float y);
+    }
+
+    public class Position : IPosition
+    {
+        public float X { get; set; }
+        public float Y { get; set; }
+
+        public Position(float x, float y)
+        {
+            X = x;
+            Y = y;
+        }
+
+        public void SetPosition(float x, float y)
+        {
+            X = x;
+            Y = y;
+        }
     }
 
     internal class Ball : IBall
     {
-        private Vector2 velocity;
         private readonly int size;
         private readonly int id;
         private float x;
@@ -31,67 +61,49 @@ namespace Data
         private Task task;
         private bool stop = false;
 
-        public Ball(int id, int size, float x, float y, Vector2 velocity, double weight)
+        public Ball(int id, int size, Position position, Vector2 velocity, double weight)
         {
             this.id = id;
             this.size = size;
-            this.x = x;
-            this.y = y;
-            this.velocity = velocity;
+            BallPosition = position;
+            Velocity = velocity;
             this.weight = weight;
         }
 
         public int BallId { get => id; }
         public int BallSize { get => size; }
 
-        public float BallPositionX
-        {
-            get => x;
-            set
-            {
-                if (value.Equals(x))
-                {
-                    return;
-                }
+        public Position BallPosition { get; set; }
 
-                x = value;
-                RaisePropertyChanged();
-            }
+        public float X
+        {
+            get => BallPosition.X;
         }
 
-        public float BallPositionY
+        public float Y
         {
-            get => y;
-            set
-            {
-                if (value.Equals(y))
-                {
-                    return;
-                }
-
-                y = value;
-                RaisePropertyChanged();
-            }
+            get => BallPosition.Y;
         }
+
         public void BallMove()
         {
-            BallPositionX += velocity.X;
-            BallPositionY += velocity.Y;
+            BallPosition.SetPosition(BallPosition.X + Velocity.X, BallPosition.Y + Velocity.Y);
+            RaisePropertyChanged(nameof(BallPosition));
         }
 
         public double BallWeight { get => weight; }
+
+        public void BallCreateMovementTask(int interval)
+        {
+            stop = false;
+            task = Run(interval);
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         internal void RaisePropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public void BallCreateMovementTask(int interval)
-        {
-            stop = false;
-            task = Run(interval);
         }
 
         private async Task Run(int interval)
@@ -114,16 +126,6 @@ namespace Data
             stop = true;
         }
 
-        public Vector2 Velocity
-        {
-            get => velocity;
-            set
-            {
-                if (value.Equals(velocity))
-                    return;
-
-                velocity = value;
-            }
-        }
+        public Vector2 Velocity { get; set; }
     }
 }
