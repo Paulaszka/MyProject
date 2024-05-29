@@ -53,6 +53,7 @@ namespace Data
         private Task task;
         private bool stop = false;
         public event PropertyChangedEventHandler PropertyChanged;
+        Mutex mutex = new Mutex();
 
         public Ball(int id, int size, Position position, Vector2 velocity, double weight)
         {
@@ -72,8 +73,10 @@ namespace Data
 
         private void BallMove()
         {
+            //mutex.WaitOne();
             BallPosition.SetPosition(BallPosition.X + Velocity.X, BallPosition.Y + Velocity.Y);
             RaisePropertyChanged(nameof(BallPosition));
+            //mutex.ReleaseMutex();
         }
 
         public void BallCreateMovementTask(int interval)
@@ -102,7 +105,7 @@ namespace Data
             }
         }
                 
-        internal void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+        internal void RaisePropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
