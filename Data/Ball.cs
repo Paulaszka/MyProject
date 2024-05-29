@@ -14,10 +14,6 @@ namespace Data
         Position BallPosition { get; set; }
         Vector2 Velocity { get; set; }
 
-        float X { get; }
-        float Y { get; }
-
-        void BallMove();
         void BallCreateMovementTask(int interval);
         void BallStop();
     }
@@ -74,17 +70,7 @@ namespace Data
         public Position BallPosition { get; set; }
         public Vector2 Velocity { get; set; }
 
-        public float X
-        {
-            get => BallPosition.X;
-        }
-
-        public float Y
-        {
-            get => BallPosition.Y;
-        }
-
-        public void BallMove()
+        private void BallMove()
         {
             BallPosition.SetPosition(BallPosition.X + Velocity.X, BallPosition.Y + Velocity.Y);
             RaisePropertyChanged(nameof(BallPosition));
