@@ -4,80 +4,23 @@ using System.Numerics;
 
 namespace Data
 {
-    public abstract class DataAbstractAPI
+    public abstract class DataAbstractAPI : IObservable<DataAbstractAPI>
     {
-        public abstract int Width { get; }
-        public abstract int Height { get; }
-        public abstract int GetAmount { get; }
+        public abstract int BallId { get; }
+        public abstract int BallSize { get; }
+        public abstract double BallWeight { get; }
 
-        public abstract IList CreateBallsList(int count);
-        public abstract IBall GetBall(int index);
+        public abstract Position BallPosition { get; set; }
+        public abstract Vector2 Velocity { get; set; }
 
-        public static DataAbstractAPI CreateApi(int width, int height)
+        public abstract void BallCreateMovementTask(int interval);
+        public abstract void BallStop();
+        public abstract IDisposable Subscribe(IObserver<DataAbstractAPI> observer);
+
+        public static DataAbstractAPI CreateApi(int id, int size, Position position, Vector2 velocity, double weight)
         {
-            return new DataAPI(width, height);
+            return new Ball(id, size, position, velocity, weight);
         }
     }
 
-    internal class DataAPI : DataAbstractAPI
-    {
-        public override int Width { get; }
-        public override int Height { get; }
-
-        private ObservableCollection<IBall> balls { get; }
-
-        private readonly Mutex mutex = new Mutex();
-        private readonly Random random = new Random();     
-
-        public DataAPI(int width, int height)
-        {
-            balls = new ObservableCollection<IBall>();
-            this.Width = width;
-            this.Height = height;
-        }
-
-        public override int GetAmount { get => balls.Count; }
-        public ObservableCollection<IBall> Balls => balls;
-        
-        public override IList CreateBallsList(int count)
-        {
-            if (count > 0)
-            {
-                int ballsCount = balls.Count;
-                for (int i = 0; i < count; i++)
-                {
-                    mutex.WaitOne();
-                    int r = 20;
-                    int pom = random.Next(20, 40);
-                    double weight = pom;
-                    float x = random.Next(r, Width - r);
-                    float y = random.Next(r, Height - r);
-                    Position position = new Position((float)x, (float)y);
-                    Vector2 velocity = new Vector2(5, 5);
-                    Ball ball = new Ball(i + 1 + ballsCount, r, position, velocity, weight);
-
-                    balls.Add(ball);
-                    mutex.ReleaseMutex();
-                }
-            }
-            if (count < 0)
-            {
-                for (int i = count; i < 0; i++)
-                {
-                    if (balls.Count > 0)
-                    {
-                        mutex.WaitOne();
-                        balls.Remove(balls[balls.Count - 1]);
-                        mutex.ReleaseMutex();
-                    };
-                }
-            }
-            return balls;
-        }
-
-        public override IBall GetBall(int index)
-        {
-            return balls[index];
-        }
-    }
 }

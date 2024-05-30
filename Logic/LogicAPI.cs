@@ -1,69 +1,80 @@
 ﻿using Data;
+using System;
 using System.Collections;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Numerics;
 
 namespace Logic
 {
-    public abstract class LogicAbstractAPI
+    public abstract class LogicAbstractAPI : IObservable<LogicAbstractAPI>, IObserver<DataAbstractAPI>
     {
         public abstract int width { get; set; }
         public abstract int height { get; set; }
         public abstract int GetAmount { get; }
+        private List<DataAbstractAPI> balls { get; }
+        public abstract IDisposable Subscribe(IObserver<LogicAbstractAPI> observer);
 
         public abstract void Start();
         public abstract void Stop();
-        public abstract void CollisionWithWall(IBall ball);
-        public abstract void Bounce(IBall ball);
-        public abstract void ChangeBallPosition(object sender, PropertyChangedEventArgs args);
+        public abstract void CollisionWithWall(DataAbstractAPI ball);
+        public abstract void Bounce(DataAbstractAPI ball);
+ 
 
         public abstract IList CreateBalls(int count);
-        public abstract IBall GetBall(int index);
+        public abstract DataAbstractAPI GetBall(int index);
 
         public static LogicAbstractAPI CreateApi(int width, int height, DataAbstractAPI dataAbstractAPI = default(DataAbstractAPI))
         {
-            if (dataAbstractAPI == null)
-            {
-                dataAbstractAPI = DataAbstractAPI.CreateApi(width, height);
-            }
             return new LogicAPI(width, height, dataAbstractAPI);
         }
+
+        public abstract void OnCompleted();
+        public abstract void OnError(Exception error);
+        public abstract void OnNext(DataAbstractAPI value);
+       
     }
 
     internal class LogicAPI : LogicAbstractAPI
     {
         public override int width { get; set; }
         public override int height { get; set; }
+        private List<DataAbstractAPI> balls { get; }
+        private readonly List<IObserver<LogicAbstractAPI>>? _observers = [];
 
         private readonly DataAbstractAPI dataAbstractAPI;
         private readonly Mutex mutex = new Mutex();
+        private readonly Random random = new Random();
 
         public LogicAPI(int width, int height, DataAbstractAPI dataAbstractAPI)
         {
+            balls = new List<DataAbstractAPI>();
             this.dataAbstractAPI = dataAbstractAPI;
             this.width = width;
             this.height = height;
         }
 
-        public override int GetAmount { get => dataAbstractAPI.GetAmount; }
+        public override int GetAmount { get => balls.Count; }
+        public List<DataAbstractAPI> Balls => balls;
+
 
         public override void Start()
         {
-            for (int i = 0; i < dataAbstractAPI.GetAmount; i++)
+            for (int i = 0; i < balls.Count; i++)
             {
-                dataAbstractAPI.GetBall(i).BallCreateMovementTask(30);
+                GetBall(i).BallCreateMovementTask(30);
             }
         }
 
         public override void Stop()
         {
-            for (int i = 0; i < dataAbstractAPI.GetAmount; i++)
+            for (int i = 0; i < balls.Count; i++)
             {
-                dataAbstractAPI.GetBall(i).BallStop();
+                GetBall(i).BallStop();
             }
         }
 
-        public override void CollisionWithWall(IBall ball)
+        public override void CollisionWithWall(DataAbstractAPI ball)
         {
             float diameter = ball.BallSize;
             float right = width - diameter;
@@ -91,11 +102,11 @@ namespace Logic
             }
         }
 
-        public override void Bounce(IBall ball)
+        public override void Bounce(DataAbstractAPI ball)
         {
-            for (int i = 0; i < dataAbstractAPI.GetAmount; i++)
+            for (int i = 0; i < balls.Count; i++)
             {
-                IBall secondBall = dataAbstractAPI.GetBall(i);
+                DataAbstractAPI secondBall = GetBall(i);
                 if (ball.BallId == secondBall.BallId)
                 {
                     continue;
@@ -119,7 +130,7 @@ namespace Logic
             }
         }
 
-        internal bool Collision(IBall a, IBall b)
+        internal bool Collision(DataAbstractAPI a, DataAbstractAPI b)
         {
             if (a == null || b == null)
             {
@@ -128,7 +139,7 @@ namespace Logic
             return Distance(a, b) <= (a.BallSize / 2 + b.BallSize / 2);
         }
 
-        internal double Distance(IBall a, IBall b)
+        internal double Distance(DataAbstractAPI a, DataAbstractAPI b)
         {
             double x1 = a.BallPosition.X + a.BallSize / 2 + a.Velocity.X;
             double y1 = a.BallPosition.Y + a.BallSize / 2 + a.Velocity.Y;
@@ -137,30 +148,88 @@ namespace Logic
             return Math.Sqrt((Math.Pow(x1 - x2, 2) + Math.Pow(y1 - y2, 2)));
         }
 
-        public override void ChangeBallPosition(object sender, PropertyChangedEventArgs args)
+
+        public override IList CreateBalls(int count)
         {
-            IBall ball = (IBall)sender;
+            if (count > 0)
+            {
+                int ballsCount = balls.Count;
+                for (int i = 0; i < count; i++)
+                {
+                    mutex.WaitOne();
+                    int r = 20;
+                    int pom = random.Next(20, 40);
+                    double weight = pom;
+                    float x = random.Next(r, width - r);
+                    float y = random.Next(r, height - r);
+                    Position position = new Position((float)x, (float)y);
+                    Vector2 velocity = new Vector2(5, 5);
+                    DataAbstractAPI ball = DataAbstractAPI.CreateApi(i + 1 + ballsCount, r, position, velocity, weight);
+
+                    balls.Add(ball);
+                    ball.Subscribe(this);
+                    mutex.ReleaseMutex();
+                }
+            }
+            if (count < 0)
+            {
+                for (int i = count; i < 0; i++)
+                {
+                    if (balls.Count > 0)
+                    {
+                        mutex.WaitOne();
+                        balls.Remove(balls[balls.Count - 1]);
+                        mutex.ReleaseMutex();
+                    };
+                }
+            }
+            return balls;
+        }
+
+        public override DataAbstractAPI GetBall(int index)
+        {
+            return balls[index];
+        }
+
+        public override IDisposable Subscribe(IObserver<LogicAbstractAPI> observer)
+        {
+            _observers.Add(observer);
+            return new SubscriptionManager(_observers, observer);
+        }
+
+        private void NotifyObservers(LogicAbstractAPI ball)
+        {
+            foreach (var observer in _observers) observer.OnNext(ball);
+        }
+
+        public override void OnNext(DataAbstractAPI ball)
+        {
             mutex.WaitOne();
             CollisionWithWall(ball);
             Bounce(ball);
             mutex.ReleaseMutex();
+
+            NotifyObservers(this);
         }
 
-        public override IList CreateBalls(int count)
+        public override void OnCompleted()
         {
-            int previousCount = dataAbstractAPI.GetAmount;
-            IList temp = dataAbstractAPI.CreateBallsList(count);
-            for (int i = 0; i < dataAbstractAPI.GetAmount - previousCount; i++)
-            {
-                dataAbstractAPI.GetBall(previousCount + i).PropertyChanged += ChangeBallPosition;
-            }
-            return temp;
+            throw new NotImplementedException();
         }
 
-        public override IBall GetBall(int index)
+        public override void OnError(Exception error)
         {
-            return dataAbstractAPI.GetBall(index);
+            throw new NotImplementedException();
         }
-
     }
+
+    internal class SubscriptionManager(ICollection<IObserver<LogicAbstractAPI>> observers, IObserver<LogicAbstractAPI> observer) : IDisposable
+    {
+        public void Dispose()
+        {
+            if (observer != null && observers.Contains(observer)) observers.Remove(observer);
+        }
+    }
+
+
 }

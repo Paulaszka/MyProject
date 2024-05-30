@@ -1,15 +1,17 @@
 ﻿using Logic;
+using System;
 using System.Collections;
-
+using System.Diagnostics;
 
 namespace Model
 {
-    public abstract class ModelAbstractAPI
+    public abstract class ModelAbstractAPI : IObserver<LogicAbstractAPI>
     {
         public abstract int width { get; }
         public abstract int height { get; }
 
         public abstract IList Start(int ballVal);
+        
 
         public abstract void StartMoving();
         public abstract void Stop();
@@ -22,6 +24,13 @@ namespace Model
             }
             return new ModelAPI(Width, Height, logicAbstractAPI);
         }
+
+        
+        public abstract void OnCompleted();
+        public abstract void OnError(Exception error);
+        public abstract void OnNext(LogicAbstractAPI value);
+
+        
     }
 
     internal class ModelAPI : ModelAbstractAPI
@@ -29,12 +38,14 @@ namespace Model
         public override int width { get; }
         public override int height { get; }
         private readonly LogicAbstractAPI logicAbstractAPI;
+        private readonly List<IObserver<ModelAbstractAPI>>? _observers = [];
 
         public ModelAPI(int Width, int Height, LogicAbstractAPI logicAbstractAPI)
         {
             width = Width;
             height = Height;
             this.logicAbstractAPI = logicAbstractAPI;
+            logicAbstractAPI.Subscribe(this);
         }
 
         public override IList Start(int ballVal) => logicAbstractAPI.CreateBalls(ballVal);
@@ -49,5 +60,26 @@ namespace Model
             logicAbstractAPI.Stop();
         }
 
+        
+
+        public override void OnCompleted()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void OnError(Exception error)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void OnNext(LogicAbstractAPI value)
+        {
+            Debug.WriteLine("dupa");
+            throw new NotImplementedException();
+        }
+
+
     }
+
+    
 }

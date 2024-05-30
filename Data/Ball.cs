@@ -1,23 +1,9 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
 using System.Numerics;
-using System.Runtime.CompilerServices;
 
 namespace Data
 {
-    public interface IBall : INotifyPropertyChanged
-    {
-        int BallId { get; }
-        int BallSize { get; }
-        double BallWeight { get; }
-
-        Position BallPosition { get; set; }
-        Vector2 Velocity { get; set; }
-
-        void BallCreateMovementTask(int interval);
-        void BallStop();
-    }
-
     public interface IPosition
     {
         float X { get; set; }
@@ -44,7 +30,7 @@ namespace Data
         }
     }
 
-    internal class Ball : IBall
+    internal class Ball : DataAbstractAPI, IObservable<DataAbstractAPI>
     {
         private readonly int size;
         private readonly int id;
@@ -52,8 +38,8 @@ namespace Data
         private readonly Stopwatch stopwatch = new Stopwatch();
         private Task task;
         private bool stop = false;
-        public event PropertyChangedEventHandler PropertyChanged;
         Mutex mutex = new Mutex();
+        private readonly List<IObserver<DataAbstractAPI>> _observers = [];
 
         public Ball(int id, int size, Position position, Vector2 velocity, double weight)
         {
@@ -64,28 +50,28 @@ namespace Data
             this.weight = weight;
         }
 
-        public int BallId { get => id; }
-        public int BallSize { get => size; }
-        public double BallWeight { get => weight; }
+        public override int BallId { get => id; }
+        public override int BallSize { get => size; }
+        public override double BallWeight { get => weight; }
 
-        public Position BallPosition { get; set; }
-        public Vector2 Velocity { get; set; }
+        public override Position BallPosition { get; set; }
+        public override Vector2 Velocity { get; set; }
 
         private void BallMove()
         {
             //mutex.WaitOne();
             BallPosition.SetPosition(BallPosition.X + Velocity.X, BallPosition.Y + Velocity.Y);
-            RaisePropertyChanged(nameof(BallPosition));
+            NotifyObservers(this);
             //mutex.ReleaseMutex();
         }
 
-        public void BallCreateMovementTask(int interval)
+        public override void BallCreateMovementTask(int interval)
         {
             stop = false;
             task = Run(interval);
         }
 
-        public void BallStop()
+        public override void BallStop()
         {
             stop = true;
         }
@@ -104,11 +90,24 @@ namespace Data
                 await Task.Delay((int)(interval - stopwatch.ElapsedMilliseconds));
             }
         }
-                
-        internal void RaisePropertyChanged([CallerMemberName] string? propertyName = null)
+
+        public override IDisposable Subscribe(IObserver<DataAbstractAPI> observer)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            _observers.Add(observer);
+            return new SubscriptionManager(_observers, observer);
         }
 
+        private void NotifyObservers(DataAbstractAPI ball)
+        {
+            foreach (var observer in _observers) observer.OnNext(ball);
+        }
+    }
+
+    internal class SubscriptionManager(ICollection<IObserver<DataAbstractAPI>> observers, IObserver<DataAbstractAPI> observer) : IDisposable
+    {
+        public void Dispose()
+        {
+            if (observer != null && observers.Contains(observer)) observers.Remove(observer);
+        }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Model
 {
-    internal class BallModel
+    internal class BallModelAPI
     {
     }
 }
