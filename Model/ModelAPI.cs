@@ -75,7 +75,7 @@ namespace Model
         public override void OnNext(LogicAbstractAPI value)
         {
             Debug.WriteLine("dupa");
-            throw new NotImplementedException();
+            
         }
 
 
