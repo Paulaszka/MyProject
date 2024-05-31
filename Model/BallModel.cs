@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Data;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -8,42 +9,20 @@ using System.Threading.Tasks;
 
 namespace Model
 {
-    public interface IPosition
-    {
-        float X { get; set; }
-        float Y { get; set; }
-
-        void SetPosition(float x, float y);
-    }
-
-    public class Position : IPosition
-    {
-        public float X { get; set; }
-        public float Y { get; set; }
-
-        public Position(float x, float y)
-        {
-            X = x;
-            Y = y;
-        }
-
-        public void SetPosition(float x, float y)
-        {
-            X = x;
-            Y = y;
-        }
-    }
 
     internal class BallModel : BallModelAPI, INotifyPropertyChanged
     {
         private readonly int size;
-        private readonly int id;
         private readonly double weight;
+        public override Vector2 Velocity { get; set; }
+        
 
-        public BallModel(int size, Position position, Vector2 velocity, double weight)
+        public BallModel(int size, float positionX, float positionY, Vector2 velocity, double weight)
         {
             this.size = size;
-            BallPosition = position;
+            //BallPosition = position;
+            this.PositionX = positionX;
+            this.PositionY = positionY;
             Velocity = velocity;
             this.weight = weight;
         }
@@ -51,8 +30,33 @@ namespace Model
         public override int BallSize { get => size; }
         public override double BallWeight { get => weight; }
 
-        public override Position BallPosition { get; set; }
-        public override Vector2 Velocity { get; set; }
+        public override float PositionX
+        {
+            get => PositionX;
+            set
+            {
+                if (value.Equals(PositionX))
+                    return;
+
+                PositionX = value;
+                OnPropertyChanged(nameof(PositionX));
+            }
+}
+
+        public override float PositionY
+        {
+            get => PositionY;
+            set
+            {
+                if (value.Equals(PositionY))
+                    return;
+
+                PositionY = value;
+                OnPropertyChanged(nameof(PositionY));
+            }
+
+        }
+
 
         public event PropertyChangedEventHandler? PropertyChanged;
 

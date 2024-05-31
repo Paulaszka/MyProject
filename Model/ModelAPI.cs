@@ -55,9 +55,9 @@ namespace Model
 
             for (var i = 0; i < ballPositions.Count; i++)
             {
-                Position position = new(ballPositions[i][0], ballPositions[i][1]);
+                //Vector2 position = new(ballPositions[i][0], ballPositions[i][1]);
                 Vector2 vector = new (5, 5);
-                BallModelAPI ball = BallModelAPI.CreateApi(20, position, vector, 30);
+                BallModelAPI ball = BallModelAPI.CreateApi(20, ballPositions[i][0], ballPositions[i][1], vector, 30);
                 _balls.Add(ball);
             }
             return _balls;
@@ -88,13 +88,14 @@ namespace Model
             Debug.WriteLine("dupa");
             for (var i = 0; i < ballPositions.Count; i++)
             {
-                if (_balls[i].BallPosition.X != ballPositions[i][0])
+                if (_balls[i].PositionX != ballPositions[i][0])
                 {
-                    _balls[i].BallPosition.X = ballPositions[i][0];
+                    _balls[i].PositionX = ballPositions[i][0];
                 }
-                if (_balls[i].BallPosition.Y != ballPositions[i][1])
+                if (_balls[i].PositionY!= ballPositions[i][1])
                 {
-                    _balls[i].BallPosition.Y = ballPositions[i][1];
+                    _balls[i].PositionY = ballPositions[i][1];
+                    
                 }
             }
         }
