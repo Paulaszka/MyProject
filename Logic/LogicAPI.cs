@@ -36,16 +36,18 @@ namespace Logic
         public override int width { get; set; }
         public override int height { get; set; }
         public override List<DataAbstractAPI> balls { get; }
-        private readonly List<IObserver<LogicAbstractAPI>>? _observers = [];
+        private readonly List<IObserver<LogicAbstractAPI>>? _observers;
 
         private readonly Mutex mutex = new Mutex();
         private readonly Random random = new Random();
+        private IDisposable? _subscriptionToken;
 
         public LogicAPI(int width, int height)
         {
             balls = new List<DataAbstractAPI>();
             this.width = width;
             this.height = height;
+            _observers = [];
         }
 
         public override int GetAmount { get => balls.Count; }
@@ -206,11 +208,7 @@ namespace Logic
 
         public override IDisposable Subscribe(IObserver<LogicAbstractAPI> observer)
         {
-            if (observer != null)
-            {
-                _observers.Add(observer);
-            }
-
+            if (!_observers.Contains(observer)) _observers.Add(observer);
             return new SubscriptionManager(_observers, observer);
         }
 
@@ -240,6 +238,16 @@ namespace Logic
         public override void OnError(Exception error)
         {
             throw new NotImplementedException();
+        }
+
+        public void Subscribe(IObservable<DataAbstractAPI> provider)
+        {
+            if (provider != null) _subscriptionToken = provider.Subscribe(this);
+        }
+
+        public void Unsubscribe()
+        {
+            _subscriptionToken?.Dispose();
         }
     }
 

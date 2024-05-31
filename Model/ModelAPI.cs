@@ -35,13 +35,14 @@ namespace Model
         private readonly LogicAbstractAPI logicAbstractAPI;
         private readonly ObservableCollection<BallModelAPI> _balls = [];
         List<List<float>> ballPositions = [];
+        private IDisposable? _subscriptionToken;
 
         public ModelAPI(int Width, int Height, LogicAbstractAPI logicAbstractAPI)
         {
             width = Width;
             height = Height;
             this.logicAbstractAPI = logicAbstractAPI;
-            logicAbstractAPI.Subscribe(this);
+            Subscribe(logicAbstractAPI);
         }
 
         public override IList Start(int ballVal)
@@ -93,6 +94,16 @@ namespace Model
                     _balls[i].PositionY = ballPositions[i][1]; 
                 }
             }
+        }
+
+        public void Subscribe(IObservable<LogicAbstractAPI> provider)
+        {
+            if (provider != null) _subscriptionToken = provider.Subscribe(this);
+        }
+
+        public void Unsubscribe()
+        {
+            _subscriptionToken?.Dispose();
         }
     }
 }
