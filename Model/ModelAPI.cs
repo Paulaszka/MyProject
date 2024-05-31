@@ -105,10 +105,6 @@ namespace Model
             return new SubscriptionManager(_observers, observer);
         }
 
-        private void NotifyObservers(ModelAbstractAPI ball)
-        {
-            foreach (var observer in _observers) observer.OnNext(ball);
-        }
     }
 
     internal class SubscriptionManager(ICollection<IObserver<ModelAbstractAPI>> observers, IObserver<ModelAbstractAPI> observer) : IDisposable
