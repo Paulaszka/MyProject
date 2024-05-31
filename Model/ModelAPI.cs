@@ -1,8 +1,6 @@
 ﻿using Logic;
-using System;
 using System.Collections;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Numerics;
 
 namespace Model
@@ -16,7 +14,7 @@ namespace Model
         public abstract void StartMoving();
         public abstract void Stop();
 
-        public static ModelAbstractAPI CreateApi(int Width, int Height, LogicAbstractAPI logicAbstractAPI = default(LogicAbstractAPI))
+        public static ModelAbstractAPI CreateApi(int Width, int Height, LogicAbstractAPI? logicAbstractAPI = default)
         {
             if (logicAbstractAPI == null)
             {
@@ -35,9 +33,8 @@ namespace Model
         public override int width { get; }
         public override int height { get; }
         private readonly LogicAbstractAPI logicAbstractAPI;
-        private readonly List<IObserver<ModelAbstractAPI>>? _observers = [];
         private readonly ObservableCollection<BallModelAPI> _balls = [];
-        List<List<float>> ballPositions;
+        List<List<float>> ballPositions = [];
 
         public ModelAPI(int Width, int Height, LogicAbstractAPI logicAbstractAPI)
         {

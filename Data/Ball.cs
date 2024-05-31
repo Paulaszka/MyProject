@@ -31,24 +31,17 @@ namespace Data
 
     internal class Ball : DataAbstractAPI, IObservable<DataAbstractAPI>
     {
-        private readonly int size;
-        private readonly double weight;
         private readonly Stopwatch stopwatch = new Stopwatch();
         private Task task;
         private bool stop = false;
         Mutex mutex = new Mutex();
         private readonly List<IObserver<DataAbstractAPI>> _observers = [];
 
-        public Ball(int size, Position position, Vector2 velocity, double weight)
+        public Ball(Position position, Vector2 velocity)
         {
-            this.size = size;
             BallPosition = position;
             Velocity = velocity;
-            this.weight = weight;
         }
-
-        public override int BallSize { get => size; }
-        public override double BallWeight { get => weight; }
 
         public override Position BallPosition { get; set; }
         public override Vector2 Velocity { get; set; }

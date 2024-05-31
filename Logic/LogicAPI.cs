@@ -9,7 +9,7 @@ namespace Logic
         public abstract int width { get; set; }
         public abstract int height { get; set; }
         public abstract int GetAmount { get; }
-        private List<DataAbstractAPI> balls { get; }
+        public abstract List<DataAbstractAPI> balls { get; }
         public abstract IDisposable Subscribe(IObserver<LogicAbstractAPI> observer);
 
         public abstract void Start();
@@ -21,9 +21,9 @@ namespace Logic
         public abstract DataAbstractAPI GetBall(int index);
         public abstract List<List<float>> GetAllBallPositions();
 
-        public static LogicAbstractAPI CreateApi(int width, int height, DataAbstractAPI dataAbstractAPI = default(DataAbstractAPI))
+        public static LogicAbstractAPI CreateApi(int width, int height)
         {
-            return new LogicAPI(width, height, dataAbstractAPI);
+            return new LogicAPI(width, height);
         }
 
         public abstract void OnCompleted();
@@ -35,17 +35,15 @@ namespace Logic
     {
         public override int width { get; set; }
         public override int height { get; set; }
-        private List<DataAbstractAPI> balls { get; }
+        public override List<DataAbstractAPI> balls { get; }
         private readonly List<IObserver<LogicAbstractAPI>>? _observers = [];
 
-        private readonly DataAbstractAPI dataAbstractAPI;
         private readonly Mutex mutex = new Mutex();
         private readonly Random random = new Random();
 
-        public LogicAPI(int width, int height, DataAbstractAPI dataAbstractAPI)
+        public LogicAPI(int width, int height)
         {
             balls = new List<DataAbstractAPI>();
-            this.dataAbstractAPI = dataAbstractAPI;
             this.width = width;
             this.height = height;
         }
@@ -66,14 +64,14 @@ namespace Logic
             for (int i = 0; i < balls.Count; i++)
             {
                 GetBall(i).BallStop();
-                balls.Clear();
+                //balls.Clear();
                 
             }
         }
 
         public override void CollisionWithWall(DataAbstractAPI ball)
         {
-            float diameter = ball.BallSize;
+            float diameter = 20;
             float right = width - diameter;
             float down = height - diameter;
 
@@ -110,8 +108,8 @@ namespace Logic
                 }
                 if (Collision(ball, secondBall))
                 {
-                    double m1 = ball.BallWeight;
-                    double m2 = secondBall.BallWeight;
+                    double m1 = 30;
+                    double m2 = 30;
                     Vector2 v1 = ball.Velocity;
                     Vector2 v2 = secondBall.Velocity;
 
@@ -122,6 +120,8 @@ namespace Logic
 
                     ball.Velocity = new Vector2((float)u1x, (float)u1y);
                     secondBall.Velocity = new Vector2((float)u2x, (float)u2y);
+                    ball.Subscribe(this);
+                    secondBall.Subscribe(this);
                     return;
                 }
             }
@@ -129,38 +129,39 @@ namespace Logic
 
         internal bool Collision(DataAbstractAPI a, DataAbstractAPI b)
         {
+            int diameter = 20;
             if (a == null || b == null)
             {
                 return false;
             }
-            return Distance(a, b) <= (a.BallSize / 2 + b.BallSize / 2);
+            return Distance(a, b) <= diameter;
         }
 
         internal double Distance(DataAbstractAPI a, DataAbstractAPI b)
         {
-            double x1 = a.BallPosition.X + a.BallSize / 2 + a.Velocity.X;
-            double y1 = a.BallPosition.Y + a.BallSize / 2 + a.Velocity.Y;
-            double x2 = b.BallPosition.X + b.BallSize / 2 + b.Velocity.X;
-            double y2 = b.BallPosition.Y + b.BallSize / 2 + b.Velocity.Y;
+            double diameter = 20;
+            double x1 = a.BallPosition.X + diameter / 2 + a.Velocity.X;
+            double y1 = a.BallPosition.Y + diameter / 2 + a.Velocity.Y;
+            double x2 = b.BallPosition.X + diameter / 2 + b.Velocity.X;
+            double y2 = b.BallPosition.Y + diameter / 2 + b.Velocity.Y;
             return Math.Sqrt((Math.Pow(x1 - x2, 2) + Math.Pow(y1 - y2, 2)));
         }
 
 
         public override IList CreateBalls(int count)
         {
-            //balls.Clear();
+            balls.Clear();
             if (count > 0)
             {
                 for (int i = 0; i < count; i++)
                 {
                     mutex.WaitOne();
-                    int r = 20;
-                    double weight = 30;
-                    float x = random.Next(r, width - r);
-                    float y = random.Next(r, height - r);
+                    int diameter = 20;
+                    float x = random.Next(diameter, width - diameter);
+                    float y = random.Next(diameter, height - diameter);
                     Position position = new Position((float)x, (float)y);
                     Vector2 velocity = new Vector2(5, 5);
-                    DataAbstractAPI ball = DataAbstractAPI.CreateApi(r, position, velocity, weight);
+                    DataAbstractAPI ball = DataAbstractAPI.CreateApi(position, velocity);
 
                     balls.Add(ball);
                     balls[i].Subscribe(this);
@@ -205,13 +206,21 @@ namespace Logic
 
         public override IDisposable Subscribe(IObserver<LogicAbstractAPI> observer)
         {
-            if (observer != null) _observers.Add(observer);
+            if (observer != null)
+            {
+                _observers.Add(observer);
+            }
+
             return new SubscriptionManager(_observers, observer);
         }
 
         private void NotifyObservers(LogicAbstractAPI ball)
         {
-            foreach (var observer in _observers) observer.OnNext(ball);
+            if (_observers != null)
+            {
+                foreach (var observer in _observers) observer.OnNext(ball);
+            }
+
         }
 
         public override void OnNext(DataAbstractAPI ball)
