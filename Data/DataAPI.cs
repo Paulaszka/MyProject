@@ -4,7 +4,6 @@ namespace Data
 {
     public abstract class DataAbstractAPI : IObservable<DataAbstractAPI>
     {
-        public abstract int BallId { get; }
         public abstract int BallSize { get; }
         public abstract double BallWeight { get; }
 
@@ -15,9 +14,9 @@ namespace Data
         public abstract void BallStop();
         public abstract IDisposable Subscribe(IObserver<DataAbstractAPI> observer);
 
-        public static DataAbstractAPI CreateApi(int id, int size, Position position, Vector2 velocity, double weight)
+        public static DataAbstractAPI CreateApi(int size, Position position, Vector2 velocity, double weight)
         {
-            return new Ball(id, size, position, velocity, weight);
+            return new Ball(size, position, velocity, weight);
         }
     }
 

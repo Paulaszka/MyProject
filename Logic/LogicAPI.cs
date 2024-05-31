@@ -20,6 +20,7 @@ namespace Logic
 
         public abstract IList CreateBalls(int count);
         public abstract DataAbstractAPI GetBall(int index);
+        public abstract List<List<float>> GetAllBallPositions();
 
         public static LogicAbstractAPI CreateApi(int width, int height, DataAbstractAPI dataAbstractAPI = default(DataAbstractAPI))
         {
@@ -104,7 +105,7 @@ namespace Logic
             for (int i = 0; i < balls.Count; i++)
             {
                 DataAbstractAPI secondBall = GetBall(i);
-                if (ball.BallId == secondBall.BallId)
+                if (balls.IndexOf(ball) == balls.IndexOf(secondBall))
                 {
                     continue;
                 }
@@ -155,13 +156,12 @@ namespace Logic
                 {
                     mutex.WaitOne();
                     int r = 20;
-                    int pom = random.Next(20, 40);
-                    double weight = pom;
+                    double weight = 30;
                     float x = random.Next(r, width - r);
                     float y = random.Next(r, height - r);
                     Position position = new Position((float)x, (float)y);
                     Vector2 velocity = new Vector2(5, 5);
-                    DataAbstractAPI ball = DataAbstractAPI.CreateApi(i + 1 + ballsCount, r, position, velocity, weight);
+                    DataAbstractAPI ball = DataAbstractAPI.CreateApi(r, position, velocity, weight);
 
                     balls.Add(ball);
                     ball.Subscribe(this);
@@ -188,6 +188,22 @@ namespace Logic
             return balls[index];
         }
 
+        public override List<List<float>> GetAllBallPositions()
+        {
+            List<List<float>> PositionList = new List<List<float>>();
+
+            foreach (DataAbstractAPI ball in balls)
+            {
+                List<float> ballPosition = new List<float>()
+                {
+                    ball.BallPosition.X,
+                    ball.BallPosition.Y
+                 };
+                PositionList.Add(ballPosition);
+            }
+            return PositionList;
+        }
+
         public override IDisposable Subscribe(IObserver<LogicAbstractAPI> observer)
         {
             _observers.Add(observer);
@@ -208,6 +224,8 @@ namespace Logic
 
             NotifyObservers(this);
         }
+
+
 
         public override void OnCompleted()
         {
