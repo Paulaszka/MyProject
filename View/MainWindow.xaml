@@ -28,8 +28,8 @@
                                      Fill="#e8d5df"
                                      Width="{Binding BallSize}"
                                      Height="{Binding BallSize}"
-                                     Canvas.Left="{Binding BallPosition.X}"
-                                     Canvas.Top="{Binding BallPosition.Y}" />
+                                     Canvas.Left="{Binding PositionX}"
+                                     Canvas.Top="{Binding PositionY}" />
                         </Canvas>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

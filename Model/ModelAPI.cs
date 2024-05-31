@@ -15,7 +15,6 @@ namespace Model
         
         public abstract void StartMoving();
         public abstract void Stop();
-        public abstract IDisposable Subscribe(IObserver<ModelAbstractAPI> observer);
 
         public static ModelAbstractAPI CreateApi(int Width, int Height, LogicAbstractAPI logicAbstractAPI = default(LogicAbstractAPI))
         {
@@ -50,12 +49,12 @@ namespace Model
 
         public override IList Start(int ballVal)
         {
+            _balls.Clear();
             logicAbstractAPI.CreateBalls(ballVal);
             ballPositions = logicAbstractAPI.GetAllBallPositions();
 
             for (var i = 0; i < ballPositions.Count; i++)
             {
-                //Vector2 position = new(ballPositions[i][0], ballPositions[i][1]);
                 Vector2 vector = new (5, 5);
                 BallModelAPI ball = BallModelAPI.CreateApi(20, ballPositions[i][0], ballPositions[i][1], vector, 30);
                 _balls.Add(ball);
@@ -85,34 +84,18 @@ namespace Model
 
         public override void OnNext(LogicAbstractAPI value)
         {
-            Debug.WriteLine("dupa");
+            ballPositions = value.GetAllBallPositions();
             for (var i = 0; i < ballPositions.Count; i++)
             {
                 if (_balls[i].PositionX != ballPositions[i][0])
                 {
                     _balls[i].PositionX = ballPositions[i][0];
                 }
-                if (_balls[i].PositionY!= ballPositions[i][1])
+                if (_balls[i].PositionY != ballPositions[i][1])
                 {
-                    _balls[i].PositionY = ballPositions[i][1];
-                    
+                    _balls[i].PositionY = ballPositions[i][1]; 
                 }
             }
-        }
-        
-        public override IDisposable Subscribe(IObserver<ModelAbstractAPI> observer)
-        {
-            _observers.Add(observer);
-            return new SubscriptionManager(_observers, observer);
-        }
-
-    }
-
-    internal class SubscriptionManager(ICollection<IObserver<ModelAbstractAPI>> observers, IObserver<ModelAbstractAPI> observer) : IDisposable
-    {
-        public void Dispose()
-        {
-            if (observer != null && observers.Contains(observer)) observers.Remove(observer);
         }
     }
 }

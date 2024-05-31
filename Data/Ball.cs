@@ -89,7 +89,7 @@ namespace Data
 
         public override IDisposable Subscribe(IObserver<DataAbstractAPI> observer)
         {
-            _observers.Add(observer);
+            if (!_observers.Contains(observer)) _observers.Add(observer);
             return new SubscriptionManager(_observers, observer);
         }
 

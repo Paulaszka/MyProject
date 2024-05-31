@@ -17,7 +17,6 @@ namespace Logic
         public abstract void CollisionWithWall(DataAbstractAPI ball);
         public abstract void Bounce(DataAbstractAPI ball);
  
-
         public abstract IList CreateBalls(int count);
         public abstract DataAbstractAPI GetBall(int index);
         public abstract List<List<float>> GetAllBallPositions();
@@ -30,7 +29,6 @@ namespace Logic
         public abstract void OnCompleted();
         public abstract void OnError(Exception error);
         public abstract void OnNext(DataAbstractAPI value);
-       
     }
 
     internal class LogicAPI : LogicAbstractAPI
@@ -55,7 +53,6 @@ namespace Logic
         public override int GetAmount { get => balls.Count; }
         public List<DataAbstractAPI> Balls => balls;
 
-
         public override void Start()
         {
             for (int i = 0; i < balls.Count; i++)
@@ -69,6 +66,8 @@ namespace Logic
             for (int i = 0; i < balls.Count; i++)
             {
                 GetBall(i).BallStop();
+                balls.Clear();
+                
             }
         }
 
@@ -149,9 +148,9 @@ namespace Logic
 
         public override IList CreateBalls(int count)
         {
+            //balls.Clear();
             if (count > 0)
             {
-                int ballsCount = balls.Count;
                 for (int i = 0; i < count; i++)
                 {
                     mutex.WaitOne();
@@ -164,7 +163,7 @@ namespace Logic
                     DataAbstractAPI ball = DataAbstractAPI.CreateApi(r, position, velocity, weight);
 
                     balls.Add(ball);
-                    ball.Subscribe(this);
+                    balls[i].Subscribe(this);
                     mutex.ReleaseMutex();
                 }
             }
@@ -190,15 +189,15 @@ namespace Logic
 
         public override List<List<float>> GetAllBallPositions()
         {
-            List<List<float>> PositionList = new List<List<float>>();
+            List<List<float>> PositionList = [];
 
             foreach (DataAbstractAPI ball in balls)
             {
-                List<float> ballPosition = new List<float>()
+                List<float> ballPosition = new()
                 {
                     ball.BallPosition.X,
                     ball.BallPosition.Y
-                 };
+                };
                 PositionList.Add(ballPosition);
             }
             return PositionList;
@@ -206,7 +205,7 @@ namespace Logic
 
         public override IDisposable Subscribe(IObserver<LogicAbstractAPI> observer)
         {
-            _observers.Add(observer);
+            if (observer != null) _observers.Add(observer);
             return new SubscriptionManager(_observers, observer);
         }
 
@@ -221,11 +220,8 @@ namespace Logic
             CollisionWithWall(ball);
             Bounce(ball);
             mutex.ReleaseMutex();
-
             NotifyObservers(this);
         }
-
-
 
         public override void OnCompleted()
         {

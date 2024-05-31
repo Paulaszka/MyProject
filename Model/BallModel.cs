@@ -1,11 +1,5 @@
-﻿using Data;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
+﻿using System.ComponentModel;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Model
 {
@@ -15,12 +9,12 @@ namespace Model
         private readonly int size;
         private readonly double weight;
         public override Vector2 Velocity { get; set; }
+        public Vector2 position;
         
 
         public BallModel(int size, float positionX, float positionY, Vector2 velocity, double weight)
         {
             this.size = size;
-            //BallPosition = position;
             this.PositionX = positionX;
             this.PositionY = positionY;
             Velocity = velocity;
@@ -32,31 +26,30 @@ namespace Model
 
         public override float PositionX
         {
-            get => PositionX;
+            get => position.X;
             set
             {
-                if (value.Equals(PositionX))
+                if (value.Equals(position.X))
                     return;
 
-                PositionX = value;
+                position.X = value;
                 OnPropertyChanged(nameof(PositionX));
             }
 }
 
         public override float PositionY
         {
-            get => PositionY;
+            get => position.Y;
             set
             {
-                if (value.Equals(PositionY))
+                if (value.Equals(position.Y))
                     return;
 
-                PositionY = value;
+                position.Y = value;
                 OnPropertyChanged(nameof(PositionY));
             }
 
         }
-
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
