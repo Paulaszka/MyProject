@@ -1,5 +1,4 @@
-﻿using Data;
-using System.Numerics;
+﻿using System.Numerics;
 
 namespace Model
 {
