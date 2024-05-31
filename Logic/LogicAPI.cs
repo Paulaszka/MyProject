@@ -22,14 +22,14 @@ namespace Logic
         public abstract DataAbstractAPI GetBall(int index);
         public abstract List<List<float>> GetAllBallPositions();
 
+        public abstract void OnCompleted();
+        public abstract void OnError(Exception error);
+        public abstract void OnNext(DataAbstractAPI value);
+
         public static LogicAbstractAPI CreateApi(int width, int height)
         {
             return new LogicAPI(width, height);
         }
-
-        public abstract void OnCompleted();
-        public abstract void OnError(Exception error);
-        public abstract void OnNext(DataAbstractAPI value);
     }
 
     internal class LogicAPI : LogicAbstractAPI
@@ -148,7 +148,6 @@ namespace Logic
             return Math.Sqrt((Math.Pow(x1 - x2, 2) + Math.Pow(y1 - y2, 2)));
         }
 
-
         public override IList CreateBalls(int count)
         {
             balls.Clear();            
@@ -160,8 +159,8 @@ namespace Logic
                     int diameter = 20;
                     float x = random.Next(diameter, width - diameter);
                     float y = random.Next(diameter, height - diameter);
-                    Position position = new Position((float)x, (float)y);
-                    Vector2 velocity = new Vector2(5, 5);
+                    Position position = new((float)x, (float)y);
+                    Vector2 velocity = new(5, 5);
                     DataAbstractAPI ball = DataAbstractAPI.CreateApi(position, velocity);
 
                     balls.Add(ball);

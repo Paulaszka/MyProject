@@ -3,12 +3,12 @@ using System.Numerics;
 
 namespace Model
 {
-
     internal class BallModel : BallModelAPI, INotifyPropertyChanged
     {
         public override Vector2 Velocity { get; set; }
         public Vector2 position;
-        
+        public event PropertyChangedEventHandler? PropertyChanged;
+
         public BallModel(float positionX, float positionY, Vector2 velocity)
         {
             this.PositionX = positionX;
@@ -41,8 +41,6 @@ namespace Model
                 OnPropertyChanged(nameof(PositionY));
             }
         }
-
-        public event PropertyChangedEventHandler? PropertyChanged;
 
         public void OnPropertyChanged(string propertyName)
         {
