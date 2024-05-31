@@ -1,6 +1,7 @@
 ﻿using Data;
 using System.Collections;
 using System.Numerics;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Logic
 {
@@ -66,8 +67,6 @@ namespace Logic
             for (int i = 0; i < balls.Count; i++)
             {
                 GetBall(i).BallStop();
-                //balls.Clear();
-                
             }
         }
 
@@ -152,7 +151,7 @@ namespace Logic
 
         public override IList CreateBalls(int count)
         {
-            balls.Clear();
+            balls.Clear();            
             if (count > 0)
             {
                 for (int i = 0; i < count; i++)
@@ -172,15 +171,7 @@ namespace Logic
             }
             if (count < 0)
             {
-                for (int i = count; i < 0; i++)
-                {
-                    if (balls.Count > 0)
-                    {
-                        mutex.WaitOne();
-                        balls.Remove(balls[balls.Count - 1]);
-                        mutex.ReleaseMutex();
-                    };
-                }
+                
             }
             return balls;
         }

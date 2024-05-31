@@ -26,8 +26,8 @@
                         <Canvas>
                             <Ellipse Stroke="#aa4465"
                                      Fill="#e8d5df"
-                                     Width="{Binding BallSize}"
-                                     Height="{Binding BallSize}"
+                                     Width="20"
+                                     Height="20"
                                      Canvas.Left="{Binding PositionX}"
                                      Canvas.Top="{Binding PositionY}" />
                         </Canvas>

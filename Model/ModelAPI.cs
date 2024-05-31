@@ -54,7 +54,7 @@ namespace Model
             for (var i = 0; i < ballPositions.Count; i++)
             {
                 Vector2 vector = new (5, 5);
-                BallModelAPI ball = BallModelAPI.CreateApi(20, ballPositions[i][0], ballPositions[i][1], vector, 30);
+                BallModelAPI ball = BallModelAPI.CreateApi(ballPositions[i][0], ballPositions[i][1], vector);
                 _balls.Add(ball);
             }
             return _balls;
