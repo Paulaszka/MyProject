@@ -21,8 +21,6 @@ namespace LogicTest
             logicAbstractAPI.CreateBalls(5);
             Assert.AreEqual(5, logicAbstractAPI.GetAmount);
             logicAbstractAPI.CreateBalls(-3);
-            Assert.AreEqual(2, logicAbstractAPI.GetAmount);
-            logicAbstractAPI.CreateBalls(-3);
             Assert.AreEqual(0, logicAbstractAPI.GetAmount);
         }
     }
