@@ -36,6 +36,8 @@ namespace Data
         private bool stop = false;
         Mutex mutex = new Mutex();
         private readonly List<IObserver<DataAbstractAPI>> _observers = [];
+        private readonly object positionLock = new();
+        private readonly object velocityLock = new();
 
         public Ball(Position position, Vector2 velocity)
         {
@@ -43,8 +45,26 @@ namespace Data
             Velocity = velocity;
         }
 
-        public override Position BallPosition { get; set; }
-        public override Vector2 Velocity { get; set; }
+        public override Position BallPosition { 
+            get => BallPosition;
+            set
+             {
+                lock (positionLock)
+                {
+                    BallPosition = value;
+                }
+            }
+        }
+        public override Vector2 Velocity { 
+            get => Velocity;
+        set
+        {
+            lock (velocityLock)
+            {
+                Velocity = value;
+            }
+        }
+         }
 
         private void BallMove()
         {

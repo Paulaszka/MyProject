@@ -41,6 +41,7 @@ namespace Logic
         private readonly Mutex mutex = new Mutex();
         private readonly Random random = new Random();
         private IDisposable? _subscriptionToken;
+        private readonly object _lock = new();
 
         public LogicAPI(int width, int height)
         {
@@ -182,15 +183,17 @@ namespace Logic
         public override List<List<float>> GetAllBallPositions()
         {
             List<List<float>> PositionList = [];
-
-            foreach (DataAbstractAPI ball in balls)
+            lock (_lock)
             {
-                List<float> ballPosition = new()
+                foreach (DataAbstractAPI ball in balls)
                 {
-                    ball.BallPosition.X,
-                    ball.BallPosition.Y
-                };
-                PositionList.Add(ballPosition);
+                    List<float> ballPosition = new()
+                    {
+                        ball.BallPosition.X,
+                        ball.BallPosition.Y
+                    };
+                    PositionList.Add(ballPosition);
+                }
             }
             return PositionList;
         }
@@ -212,10 +215,11 @@ namespace Logic
 
         public override void OnNext(DataAbstractAPI ball)
         {
-            mutex.WaitOne();
-            CollisionWithWall(ball);
-            Bounce(ball);
-            mutex.ReleaseMutex();
+            lock (_lock)
+            {
+                CollisionWithWall(ball);
+                Bounce(ball);
+            }
             NotifyObservers(this);
         }
 

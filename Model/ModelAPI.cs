@@ -35,6 +35,7 @@ namespace Model
         private readonly ObservableCollection<BallModelAPI> _balls = [];
         List<List<float>> ballPositions = [];
         private IDisposable? _subscriptionToken;
+        private readonly object _lock = new();
 
         public ModelAPI(int Width, int Height, LogicAbstractAPI logicAbstractAPI)
         {
@@ -81,16 +82,19 @@ namespace Model
 
         public override void OnNext(LogicAbstractAPI value)
         {
-            ballPositions = value.GetAllBallPositions();
-            for (var i = 0; i < ballPositions.Count; i++)
+            lock (_lock)
             {
-                if (_balls[i].PositionX != ballPositions[i][0])
+                ballPositions = value.GetAllBallPositions();
+                for (var i = 0; i < ballPositions.Count; i++)
                 {
-                    _balls[i].PositionX = ballPositions[i][0];
-                }
-                if (_balls[i].PositionY != ballPositions[i][1])
-                {
-                    _balls[i].PositionY = ballPositions[i][1]; 
+                    if (_balls[i].PositionX != ballPositions[i][0])
+                    {
+                        _balls[i].PositionX = ballPositions[i][0];
+                    }
+                    if (_balls[i].PositionY != ballPositions[i][1])
+                    {
+                        _balls[i].PositionY = ballPositions[i][1]; 
+                    }
                 }
             }
         }
