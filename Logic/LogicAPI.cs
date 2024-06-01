@@ -38,14 +38,16 @@ namespace Logic
         public override List<DataAbstractAPI> balls { get; }
         private readonly List<IObserver<LogicAbstractAPI>>? _observers;
 
-        private readonly Mutex mutex = new Mutex();
         private readonly Random random = new Random();
         private IDisposable? _subscriptionToken;
         private readonly object _lock = new();
 
         public LogicAPI(int width, int height)
         {
-            balls = new List<DataAbstractAPI>();
+            lock (_lock)
+            {
+                balls = [];
+            }
             this.width = width;
             this.height = height;
             _observers = [];
@@ -150,25 +152,30 @@ namespace Logic
 
         public override IList CreateBalls(int count)
         {
-            balls.Clear();            
+            lock (_lock)
+            {
+                balls.Clear();
+            }           
+            
             if (count > 0)
             {
                 for (int i = 0; i < count; i++)
                 {
-                    mutex.WaitOne();
-                    int diameter = 20;
-                    float x = random.Next(diameter, width - diameter);
-                    float y = random.Next(diameter, height - diameter);
-                    Position position = new((float)x, (float)y);
-                    Vector2 velocity = new(5, 5);
-                    DataAbstractAPI ball = DataAbstractAPI.CreateApi(position, velocity);
+                    lock (_lock)
+                    {
+                        int diameter = 20;
+                        float x = random.Next(diameter, width - diameter);
+                        float y = random.Next(diameter, height - diameter);
+                        Position position = new((float)x, (float)y);
+                        Vector2 velocity = new(5, 5);
+                        DataAbstractAPI ball = DataAbstractAPI.CreateApi(position, velocity);
 
-                    balls.Add(ball);
-                    balls[i].Subscribe(this);
-                    mutex.ReleaseMutex();
+                        balls.Add(ball);
+                        balls[i].Subscribe(this);
+                    }
                 }
             }
-            if (count < 0)
+            else
             {
                 
             }
@@ -210,7 +217,6 @@ namespace Logic
             {
                 foreach (var observer in _observers) observer.OnNext(ball);
             }
-
         }
 
         public override void OnNext(DataAbstractAPI ball)
@@ -236,11 +242,6 @@ namespace Logic
         public void Subscribe(IObservable<DataAbstractAPI> provider)
         {
             if (provider != null) _subscriptionToken = provider.Subscribe(this);
-        }
-
-        public void Unsubscribe()
-        {
-            _subscriptionToken?.Dispose();
         }
     }
 

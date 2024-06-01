@@ -13,6 +13,10 @@ namespace Model
         public abstract void StartMoving();
         public abstract void Stop();
 
+        public abstract void OnCompleted();
+        public abstract void OnError(Exception error);
+        public abstract void OnNext(LogicAbstractAPI value);
+
         public static ModelAbstractAPI CreateApi(int Width, int Height, LogicAbstractAPI? logicAbstractAPI = default)
         {
             if (logicAbstractAPI == null)
@@ -21,10 +25,6 @@ namespace Model
             }
             return new ModelAPI(Width, Height, logicAbstractAPI);
         }
-
-        public abstract void OnCompleted();
-        public abstract void OnError(Exception error);
-        public abstract void OnNext(LogicAbstractAPI value);
     }
 
     internal class ModelAPI : ModelAbstractAPI, IObserver<LogicAbstractAPI>
@@ -32,7 +32,7 @@ namespace Model
         public override int width { get; }
         public override int height { get; }
         private readonly LogicAbstractAPI logicAbstractAPI;
-        private readonly ObservableCollection<BallModelAPI> _balls = [];
+        private readonly ObservableCollection<BallModelAPI> modelBallsCollection = [];
         List<List<float>> ballPositions = [];
         private IDisposable? _subscriptionToken;
         private readonly object _lock = new();
@@ -47,17 +47,23 @@ namespace Model
 
         public override IList Start(int ballVal)
         {
-            _balls.Clear();
+            lock (_lock)
+            {
+                modelBallsCollection.Clear();
+            }
             logicAbstractAPI.CreateBalls(ballVal);
             ballPositions = logicAbstractAPI.GetAllBallPositions();
 
             for (var i = 0; i < ballPositions.Count; i++)
             {
-                Vector2 vector = new (5, 5);
-                BallModelAPI ball = BallModelAPI.CreateApi(ballPositions[i][0], ballPositions[i][1], vector);
-                _balls.Add(ball);
+                lock (_lock)
+                {
+                    Vector2 vector = new(5, 5);
+                    BallModelAPI ball = BallModelAPI.CreateApi(ballPositions[i][0], ballPositions[i][1], vector);
+                    modelBallsCollection.Add(ball);
+                }
             }
-            return _balls;
+            return modelBallsCollection;
         }
 
         public override void StartMoving()
@@ -87,13 +93,13 @@ namespace Model
                 ballPositions = value.GetAllBallPositions();
                 for (var i = 0; i < ballPositions.Count; i++)
                 {
-                    if (_balls[i].PositionX != ballPositions[i][0])
+                    if (modelBallsCollection[i].PositionX != ballPositions[i][0])
                     {
-                        _balls[i].PositionX = ballPositions[i][0];
+                        modelBallsCollection[i].PositionX = ballPositions[i][0];
                     }
-                    if (_balls[i].PositionY != ballPositions[i][1])
+                    if (modelBallsCollection[i].PositionY != ballPositions[i][1])
                     {
-                        _balls[i].PositionY = ballPositions[i][1]; 
+                        modelBallsCollection[i].PositionY = ballPositions[i][1]; 
                     }
                 }
             }
@@ -102,11 +108,6 @@ namespace Model
         public void Subscribe(IObservable<LogicAbstractAPI> provider)
         {
             if (provider != null) _subscriptionToken = provider.Subscribe(this);
-        }
-
-        public void Unsubscribe()
-        {
-            _subscriptionToken?.Dispose();
-        }
+        }        
     }
 }

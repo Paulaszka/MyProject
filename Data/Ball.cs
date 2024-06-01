@@ -34,44 +34,44 @@ namespace Data
         private readonly Stopwatch stopwatch = new Stopwatch();
         private Task task;
         private bool stop = false;
-        Mutex mutex = new Mutex();
         private readonly List<IObserver<DataAbstractAPI>> _observers = [];
         private readonly object positionLock = new();
         private readonly object velocityLock = new();
+        private Position position;
+        private Vector2 velocity;
 
-        public Ball(Position position, Vector2 velocity)
+        public Ball(Position _position, Vector2 _velocity)
         {
-            BallPosition = position;
-            Velocity = velocity;
+            position = _position;
+            velocity = _velocity;
         }
 
         public override Position BallPosition { 
-            get => BallPosition;
+            get => position;
             set
              {
                 lock (positionLock)
                 {
-                    BallPosition = value;
+                    position = value;
                 }
             }
         }
+
         public override Vector2 Velocity { 
-            get => Velocity;
-        set
-        {
-            lock (velocityLock)
+            get => velocity;
+            set
             {
-                Velocity = value;
+                lock (velocityLock)
+                {
+                    velocity = value;
+                }
             }
         }
-         }
 
         private void BallMove()
         {
-            //mutex.WaitOne();
             BallPosition.SetPosition(BallPosition.X + Velocity.X, BallPosition.Y + Velocity.Y);
             NotifyObservers(this);
-            //mutex.ReleaseMutex();
         }
 
         public override void BallCreateMovementTask(int interval)
