@@ -37,13 +37,16 @@ namespace Data
         private readonly List<IObserver<DataAbstractAPI>> _observers = [];
         private readonly object positionLock = new();
         private readonly object velocityLock = new();
+        private readonly object loggerLock = new();
         private Position position;
         private Vector2 velocity;
+        private LoggerAPI loggerAPI;
 
         public Ball(Position _position, Vector2 _velocity)
         {
             position = _position;
             velocity = _velocity;
+            loggerAPI = LoggerAPI.CreateLogger();
         }
 
         public override Position BallPosition { 
@@ -72,6 +75,10 @@ namespace Data
         {
             BallPosition.SetPosition(BallPosition.X + Velocity.X, BallPosition.Y + Velocity.Y);
             NotifyObservers(this);
+            lock (loggerLock)
+            {
+                loggerAPI.AddBallToQueue(this);
+            }
         }
 
         public override void BallCreateMovementTask(int interval)
