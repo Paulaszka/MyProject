@@ -46,7 +46,7 @@ namespace Logic
         {
             lock (_lock)
             {
-                balls = [];
+                balls = new();
             }
             this.width = width;
             this.height = height;
@@ -168,7 +168,7 @@ namespace Logic
                         float y = random.Next(diameter, height - diameter);
                         Position position = new((float)x, (float)y);
                         Vector2 velocity = new(5, 5);
-                        DataAbstractAPI ball = DataAbstractAPI.CreateApi(position, velocity);
+                        DataAbstractAPI ball = DataAbstractAPI.CreateApi(balls.Count, position, velocity);
 
                         balls.Add(ball);
                         balls[i].Subscribe(this);

@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Numerics;
-using System.Text;
+﻿using System.Collections.Concurrent;
 using System.Text.Json;
 
 namespace Data
@@ -15,10 +7,15 @@ namespace Data
     {
         public abstract void AddBallToQueue(DataAbstractAPI ball);
         public abstract void WriteToJson();
+        private static LoggerAPI instance;
 
-        public static LoggerAPI CreateLogger() 
+        public static LoggerAPI GetInstance()
         {
-            return new Logger();
+            if (instance == null)
+            {
+                instance = new Logger();
+            }
+            return instance;
         }
     }
 
@@ -36,15 +33,14 @@ namespace Data
 
         public override void AddBallToQueue(DataAbstractAPI ball)
         {
-            //else
-            //{
-            Position _position = new(ball.BallPosition.X, ball.BallPosition.Y);
-            ConcurrentQueue.Enqueue(BallLoggerAPI.CreateBallLogger(_position, DateTime.Now));
-            //}
-            //
             if (ConcurrentQueue.Count >= maxQueue && IsQueueFull == false)
             {
                 IsQueueFull = true;
+            }
+            else
+            {
+            Position _position = new(ball.BallPosition.X, ball.BallPosition.Y);
+            ConcurrentQueue.Enqueue(BallLoggerAPI.CreateBallLogger(ball.BallId, _position, DateTime.Now));
             }
         }
 
@@ -66,9 +62,8 @@ namespace Data
                         IsQueueFull = false;
                     }
                     await streamWriter.FlushAsync();
-                    Task.Delay(1000).Wait();
+                    await Task.Delay(100);
                 }
-                
             });
         }
     }

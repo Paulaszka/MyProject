@@ -38,15 +38,17 @@ namespace Data
         private readonly object positionLock = new();
         private readonly object velocityLock = new();
         private readonly object loggerLock = new();
+        private int id;
         private Position position;
         private Vector2 velocity;
         private LoggerAPI loggerAPI;
 
-        public Ball(Position _position, Vector2 _velocity)
+        public Ball(int _id, Position _position, Vector2 _velocity)
         {
+            id = _id;
             position = _position;
             velocity = _velocity;
-            loggerAPI = LoggerAPI.CreateLogger();
+            loggerAPI = LoggerAPI.GetInstance();
         }
 
         public override Position BallPosition { 
@@ -68,6 +70,15 @@ namespace Data
                 {
                     velocity = value;
                 }
+            }
+        }
+
+        public override int BallId
+        { 
+            get => id;
+            set
+            {
+                id = value;
             }
         }
 
