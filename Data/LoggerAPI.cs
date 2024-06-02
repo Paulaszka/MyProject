@@ -7,15 +7,15 @@ namespace Data
     {
         public abstract void AddBallToQueue(DataAbstractAPI ball);
         public abstract void WriteToJson();
-        private static LoggerAPI instance;
+        private static LoggerAPI loggerAPI;
 
         public static LoggerAPI GetInstance()
         {
-            if (instance == null)
+            if (loggerAPI == null)
             {
-                instance = new Logger();
+                loggerAPI = new Logger();
             }
-            return instance;
+            return loggerAPI;
         }
     }
 
@@ -39,8 +39,8 @@ namespace Data
             }
             else
             {
-            Position _position = new(ball.BallPosition.X, ball.BallPosition.Y);
-            ConcurrentQueue.Enqueue(BallLoggerAPI.CreateBallLogger(ball.BallId, _position, DateTime.Now));
+            Position position = new(ball.BallPosition.X, ball.BallPosition.Y);
+            ConcurrentQueue.Enqueue(BallLoggerAPI.CreateBallLogger(ball.BallId, position, DateTime.Now));
             }
         }
 

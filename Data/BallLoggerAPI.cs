@@ -17,7 +17,6 @@
         private Position position;
         private DateTime datetime;
         private int id;
-        private static readonly object idLock = new();
         private readonly object positionLock = new();
 
         public BallLogger(int _id, Position _position, DateTime _datetime)
@@ -29,7 +28,13 @@
 
         public override Position BallPosition
         {
-            get => position;
+            get
+            {
+                lock (positionLock)
+                {
+                    return position;
+                }
+            }
             set
             {
                 lock (positionLock)

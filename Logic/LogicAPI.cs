@@ -10,7 +10,6 @@ namespace Logic
         public abstract int height { get; set; }
         public abstract int GetAmount { get; }
         public abstract List<DataAbstractAPI> balls { get; }
-        public abstract IDisposable Subscribe(IObserver<LogicAbstractAPI> observer);
 
         public abstract void Start();
         public abstract void Stop();
@@ -21,6 +20,7 @@ namespace Logic
         public abstract DataAbstractAPI GetBall(int index);
         public abstract List<List<float>> GetAllBallPositions();
 
+        public abstract IDisposable Subscribe(IObserver<LogicAbstractAPI> observer);
         public abstract void OnCompleted();
         public abstract void OnError(Exception error);
         public abstract void OnNext(DataAbstractAPI value);
@@ -36,12 +36,11 @@ namespace Logic
         public override int width { get; set; }
         public override int height { get; set; }
         public override List<DataAbstractAPI> balls { get; }
-        private readonly List<IObserver<LogicAbstractAPI>>? _observers;
-
-        private readonly Random random = new Random();
-        private IDisposable? _subscriptionToken;
         private readonly object _lock = new();
-
+        private readonly Random random = new Random();
+        private readonly List<IObserver<LogicAbstractAPI>>? _observers;
+        private IDisposable? _subscriptionToken;
+        
         public LogicAPI(int width, int height)
         {
             lock (_lock)
