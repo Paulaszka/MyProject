@@ -31,11 +31,11 @@ namespace Model
     {
         public override int width { get; }
         public override int height { get; }
+        private readonly object _lock = new();
         private readonly LogicAbstractAPI logicAbstractAPI;
         private readonly ObservableCollection<BallModelAPI> modelBallsCollection = [];
         List<List<float>> ballPositions = [];
-        private IDisposable? _subscriptionToken;
-        private readonly object _lock = new();
+        private IDisposable? subscriptionKey;
 
         public ModelAPI(int Width, int Height, LogicAbstractAPI logicAbstractAPI)
         {
@@ -54,7 +54,7 @@ namespace Model
             logicAbstractAPI.CreateBalls(ballVal);
             ballPositions = logicAbstractAPI.GetAllBallPositions();
 
-            for (var i = 0; i < ballPositions.Count; i++)
+            for (int i = 0; i < ballPositions.Count; i++)
             {
                 lock (_lock)
                 {
@@ -91,7 +91,7 @@ namespace Model
             lock (_lock)
             {
                 ballPositions = value.GetAllBallPositions();
-                for (var i = 0; i < ballPositions.Count; i++)
+                for (int i = 0; i < ballPositions.Count; i++)
                 {
                     if (modelBallsCollection[i].PositionX != ballPositions[i][0])
                     {
@@ -107,7 +107,7 @@ namespace Model
 
         public void Subscribe(IObservable<LogicAbstractAPI> provider)
         {
-            if (provider != null) _subscriptionToken = provider.Subscribe(this);
+            if (provider != null) subscriptionKey = provider.Subscribe(this);
         }        
     }
 }

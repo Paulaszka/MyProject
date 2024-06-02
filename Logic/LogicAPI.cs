@@ -39,7 +39,7 @@ namespace Logic
         private readonly object _lock = new();
         private readonly Random random = new Random();
         private readonly List<IObserver<LogicAbstractAPI>>? _observers;
-        private IDisposable? _subscriptionToken;
+        private IDisposable? subscriptionKey;
         
         public LogicAPI(int width, int height)
         {
@@ -122,8 +122,6 @@ namespace Logic
 
                     ball.Velocity = new Vector2((float)u1x, (float)u1y);
                     secondBall.Velocity = new Vector2((float)u2x, (float)u2y);
-                    ball.Subscribe(this);
-                    secondBall.Subscribe(this);
                     return;
                 }
             }
@@ -165,7 +163,7 @@ namespace Logic
                         int diameter = 20;
                         float x = random.Next(diameter, width - diameter);
                         float y = random.Next(diameter, height - diameter);
-                        Position position = new((float)x, (float)y);
+                        IPosition position = IPosition.CreatePosition((float)x, (float)y);
                         Vector2 velocity = new(5, 5);
                         DataAbstractAPI ball = DataAbstractAPI.CreateApi(balls.Count, position, velocity);
 
@@ -207,7 +205,7 @@ namespace Logic
         public override IDisposable Subscribe(IObserver<LogicAbstractAPI> observer)
         {
             if (!_observers.Contains(observer)) _observers.Add(observer);
-            return new SubscriptionManager(_observers, observer);
+            return new SubscriptionKey(_observers, observer);
         }
 
         private void NotifyObservers(LogicAbstractAPI ball)
@@ -240,11 +238,11 @@ namespace Logic
 
         public void Subscribe(IObservable<DataAbstractAPI> provider)
         {
-            if (provider != null) _subscriptionToken = provider.Subscribe(this);
+            if (provider != null) subscriptionKey = provider.Subscribe(this);
         }
     }
 
-    internal class SubscriptionManager(ICollection<IObserver<LogicAbstractAPI>> observers, IObserver<LogicAbstractAPI> observer) : IDisposable
+    internal class SubscriptionKey(ICollection<IObserver<LogicAbstractAPI>> observers, IObserver<LogicAbstractAPI> observer) : IDisposable
     {
         public void Dispose()
         {

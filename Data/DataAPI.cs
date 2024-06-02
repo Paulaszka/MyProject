@@ -6,14 +6,14 @@ namespace Data
     public abstract class DataAbstractAPI : IObservable<DataAbstractAPI>
     {
         public abstract int BallId { get; set; }
-        public abstract Position BallPosition { get; set; }
+        public abstract IPosition BallPosition { get; set; }
         public abstract Vector2 Velocity { get; set; }
 
         public abstract void BallCreateMovementTask(int interval);
         public abstract void BallStop();
         public abstract IDisposable Subscribe(IObserver<DataAbstractAPI> observer);
 
-        public static DataAbstractAPI CreateApi(int id, Position position, Vector2 velocity)
+        public static DataAbstractAPI CreateApi(int id, IPosition position, Vector2 velocity)
         {
             return new Ball(id, position, velocity);
         }
@@ -24,10 +24,15 @@ namespace Data
         float X { get; set; }
         float Y { get; set; }
 
+        public static IPosition CreatePosition(float x, float y)
+        {
+            return new Position(x, y);
+        }
+
         void SetPosition(float x, float y);
     }
 
-    public class Position : IPosition
+    internal class Position : IPosition
     {
         public float X { get; set; }
         public float Y { get; set; }
@@ -55,11 +60,11 @@ namespace Data
         private readonly object velocityLock = new();
         private readonly object loggerLock = new();
         private int id;
-        private Position position;
+        private IPosition position;
         private Vector2 velocity;
         private LoggerAPI loggerAPI;
 
-        public Ball(int _id, Position _position, Vector2 _velocity)
+        public Ball(int _id, IPosition _position, Vector2 _velocity)
         {
             id = _id;
             position = _position;
@@ -67,7 +72,7 @@ namespace Data
             loggerAPI = LoggerAPI.GetInstance();
         }
 
-        public override Position BallPosition
+        public override IPosition BallPosition
         {
             get
             {
@@ -151,7 +156,7 @@ namespace Data
         public override IDisposable Subscribe(IObserver<DataAbstractAPI> observer)
         {
             if (!_observers.Contains(observer)) _observers.Add(observer);
-            return new SubscriptionManager(_observers, observer);
+            return new SubscriptionKey(_observers, observer);
         }
 
         private void NotifyObservers(DataAbstractAPI ball)
@@ -160,7 +165,7 @@ namespace Data
         }
     }
 
-    internal class SubscriptionManager(ICollection<IObserver<DataAbstractAPI>> observers, IObserver<DataAbstractAPI> observer) : IDisposable
+    internal class SubscriptionKey(ICollection<IObserver<DataAbstractAPI>> observers, IObserver<DataAbstractAPI> observer) : IDisposable
     {
         public void Dispose()
         {

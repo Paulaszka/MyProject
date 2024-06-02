@@ -19,13 +19,13 @@ namespace Model
     {
         private Vector2 position;
         private Vector2 velocity;
-        private readonly object _velocityLock;
+        private readonly object _velocityLock = new();
         public event PropertyChangedEventHandler? PropertyChanged;
 
         public BallModel(float positionX, float positionY, Vector2 velocity)
         {
-            this.PositionX = positionX;
-            this.PositionY = positionY;
+            PositionX = positionX;
+            PositionY = positionY;
             Velocity = velocity;
         }
 

@@ -10,7 +10,7 @@ namespace DataTest
         [TestMethod]
         public void ConstructorTest()
         {
-            Position position1 = new(100, 200);
+            IPosition position1 = IPosition.CreatePosition(100, 200);
             Vector2 vector = new(5, 10);
             DataAbstractAPI ball = DataAbstractAPI.CreateApi(1,position1, vector);
             Assert.AreEqual(100, ball.BallPosition.X);

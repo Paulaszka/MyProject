@@ -3,10 +3,10 @@
     public abstract class BallLoggerAPI
     {
         public abstract int Id { get; set; }
-        public abstract Position BallPosition { get; set; }
+        public abstract IPosition BallPosition { get; set; }
         public abstract DateTime DateTime { get; set; }
 
-        public static BallLoggerAPI CreateBallLogger(int _id, Position _position, DateTime _datetime)
+        public static BallLoggerAPI CreateBallLogger(int _id, IPosition _position, DateTime _datetime)
         {
             return new BallLogger(_id, _position, _datetime);
         }
@@ -14,19 +14,19 @@
 
     internal class BallLogger : BallLoggerAPI
     {
-        private Position position;
+        private IPosition position;
         private DateTime datetime;
         private int id;
         private readonly object positionLock = new();
 
-        public BallLogger(int _id, Position _position, DateTime _datetime)
+        public BallLogger(int _id, IPosition _position, DateTime _datetime)
         {
             id = _id;
             position = _position;
             datetime = _datetime; 
         }
 
-        public override Position BallPosition
+        public override IPosition BallPosition
         {
             get
             {

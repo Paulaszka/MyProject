@@ -21,7 +21,7 @@ namespace Data
 
     internal class Logger : LoggerAPI
     {
-        private readonly int maxQueue = 1000;
+        private readonly int maxQueue = 1500;
         private bool IsQueueFull = false;
         private ConcurrentQueue<BallLoggerAPI> ConcurrentQueue;
 
@@ -39,7 +39,7 @@ namespace Data
             }
             else
             {
-            Position position = new(ball.BallPosition.X, ball.BallPosition.Y);
+            IPosition position = IPosition.CreatePosition(ball.BallPosition.X, ball.BallPosition.Y);
             ConcurrentQueue.Enqueue(BallLoggerAPI.CreateBallLogger(ball.BallId, position, DateTime.Now));
             }
         }
@@ -62,7 +62,6 @@ namespace Data
                         IsQueueFull = false;
                     }
                     await streamWriter.FlushAsync();
-                    await Task.Delay(100);
                 }
             });
         }
