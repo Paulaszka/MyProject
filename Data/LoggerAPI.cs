@@ -2,7 +2,9 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Numerics;
 using System.Text;
 using System.Text.Json;
@@ -22,38 +24,34 @@ namespace Data
 
     internal class Logger : LoggerAPI
     {
-        private readonly string FileName = "./logfile";
         private readonly int maxQueue = 1000;
         private bool IsQueueFull = false;
-        private readonly ConcurrentQueue<BallLoggerAPI> ConcurrentQueue;
-        private Task _loggingTask;
-        
+        private ConcurrentQueue<BallLoggerAPI> ConcurrentQueue;
+
         public Logger()
         {
-            WriteToJson();
+            ConcurrentQueue = new ConcurrentQueue<BallLoggerAPI>();
+            Task.Run(() => WriteToJson());
         }
 
         public override void AddBallToQueue(DataAbstractAPI ball)
         {
-            Task.Run(() =>
+            //else
+            //{
+            Position _position = new(ball.BallPosition.X, ball.BallPosition.Y);
+            ConcurrentQueue.Enqueue(BallLoggerAPI.CreateBallLogger(_position, DateTime.Now));
+            //}
+            //
+            if (ConcurrentQueue.Count >= maxQueue && IsQueueFull == false)
             {
-                if (ConcurrentQueue.Count >= maxQueue && IsQueueFull == false)
-                {
-                    IsQueueFull = true;
-                }
-                else
-                {
-                    Position _position = new(ball.BallPosition.X, ball.BallPosition.Y);
-                    Vector2 _velocity = new Vector2(ball.Velocity.X, ball.Velocity.Y);
-                    ConcurrentQueue.Enqueue(BallLoggerAPI.CreateBallLogger(_position, _velocity, DateTime.Now));
-                }   
-            });
+                IsQueueFull = true;
+            }
         }
 
         public override void WriteToJson()
         {
             Task.Run(async () => {
-                using StreamWriter streamWriter = new("log.json");
+                using StreamWriter streamWriter = new(Path.Combine(Environment.CurrentDirectory, "log.json"));
                 while (true)
                 {
                     while (ConcurrentQueue.TryDequeue(out BallLoggerAPI removedBall))
@@ -64,11 +62,13 @@ namespace Data
 
                     if (IsQueueFull)
                     {
-                        await streamWriter.WriteLineAsync("Buffer Overload");
+                        await streamWriter.WriteLineAsync("Buffer is filled");
                         IsQueueFull = false;
                     }
                     await streamWriter.FlushAsync();
+                    Task.Delay(1000).Wait();
                 }
+                
             });
         }
     }
