@@ -5,17 +5,21 @@ namespace Data
 {
     abstract class LoggerAPI
     {
-        public abstract void AddBallToQueue(DataAbstractAPI ball);
+        public abstract void AddBallToQueue(DataAbstractAPI ball, DateTime dateTime);
         public abstract void WriteToJson();
         private static LoggerAPI loggerAPI;
-
-        public static LoggerAPI GetInstance()
+        public readonly object _instanceLock = new();
+        
+        public LoggerAPI GetInstance()
         {
-            if (loggerAPI == null)
+            lock (_instanceLock)
             {
-                loggerAPI = new Logger();
+                if (loggerAPI == null)
+                {
+                    loggerAPI = new Logger();
+                }
+                return loggerAPI;
             }
-            return loggerAPI;
         }
     }
 
@@ -23,24 +27,30 @@ namespace Data
     {
         private readonly int maxQueue = 1500;
         private bool IsQueueFull = false;
-        private ConcurrentQueue<BallLoggerAPI> ConcurrentQueue;
+        ConcurrentQueue<BallLoggerAPI> ConcurrentQueue;
+        private BlockingCollection<BallLoggerAPI> BlockingQueue;
+        private object _lock = new object();
 
         public Logger()
         {
             ConcurrentQueue = new ConcurrentQueue<BallLoggerAPI>();
+            BlockingQueue = new BlockingCollection<BallLoggerAPI> (ConcurrentQueue, maxQueue);
             Task.Run(() => WriteToJson());
         }
 
-        public override void AddBallToQueue(DataAbstractAPI ball)
+        public override void AddBallToQueue(DataAbstractAPI ball, DateTime dateTime)
         {
-            if (ConcurrentQueue.Count >= maxQueue && IsQueueFull == false)
+            lock (_lock)
             {
-                IsQueueFull = true;
-            }
-            else
-            {
-            IPosition position = IPosition.CreatePosition(ball.BallPosition.X, ball.BallPosition.Y);
-            ConcurrentQueue.Enqueue(BallLoggerAPI.CreateBallLogger(ball.BallId, position, DateTime.Now));
+                if (BlockingQueue.Count >= maxQueue && IsQueueFull == false)
+                {
+                    IsQueueFull = true;
+                }
+                else
+                {
+                    IPosition position = IPosition.CreatePosition(ball.BallPosition.X, ball.BallPosition.Y);
+                    BlockingQueue.Add(BallLoggerAPI.CreateBallLogger(ball.BallId, position, dateTime));
+                }
             }
         }
 
@@ -50,7 +60,7 @@ namespace Data
                 using StreamWriter streamWriter = new(Path.Combine(Environment.CurrentDirectory, "log.json"));
                 while (true)
                 {
-                    while (ConcurrentQueue.TryDequeue(out BallLoggerAPI removedBall))
+                    while (BlockingQueue.TryTake(out BallLoggerAPI removedBall))
                     {
                         string log = JsonSerializer.Serialize(removedBall);
                         await streamWriter.WriteLineAsync(log);
