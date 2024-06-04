@@ -11,7 +11,7 @@ namespace Data
         private BlockingCollection<BallLoggerAPI> BlockingQueue;
         private object _lock = new object();
         private static Logger loggerAPI;
-        public readonly object _instanceLock = new();
+        public static readonly object _instanceLock = new();
 
         public Logger()
         {
@@ -20,7 +20,7 @@ namespace Data
             Task.Run(() => WriteToJson());
         }
 
-        public Logger GetInstance()
+        public static Logger GetInstance()
         {
             lock (_instanceLock)
             {

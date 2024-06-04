@@ -69,7 +69,7 @@ namespace Data
             id = _id;
             position = _position;
             velocity = _velocity;
-            loggerAPI = loggerAPI.GetInstance();
+            loggerAPI = Logger.GetInstance();
         }
 
         public override IPosition BallPosition
@@ -117,9 +117,9 @@ namespace Data
             }
         }
 
-        private void BallMove(double time)
+        private void BallMove()
         {
-            BallPosition.SetPosition(BallPosition.X + Velocity.X * (float)time, BallPosition.Y + Velocity.Y * (float)time);
+            BallPosition.SetPosition(BallPosition.X + Velocity.X, BallPosition.Y + Velocity.Y);
             NotifyObservers(this);
             loggerAPI.AddBallToQueue(this, DateTime.Now);
         }
@@ -143,7 +143,7 @@ namespace Data
                 stopwatch.Start();
                 if (!stop)
                 {
-                    BallMove(stopwatch.Elapsed.TotalSeconds);
+                    BallMove();
                 }
                 stopwatch.Stop();
                 await Task.Delay((int)(interval - stopwatch.ElapsedMilliseconds));
