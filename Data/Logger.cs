@@ -3,14 +3,24 @@ using System.Text.Json;
 
 namespace Data
 {
-    abstract class LoggerAPI
+    public class Logger
     {
-        public abstract void AddBallToQueue(DataAbstractAPI ball, DateTime dateTime);
-        public abstract void WriteToJson();
-        private static LoggerAPI loggerAPI;
+        private readonly int maxQueue = 1500;
+        private bool IsQueueFull = false;
+        ConcurrentQueue<BallLoggerAPI> ConcurrentQueue;
+        private BlockingCollection<BallLoggerAPI> BlockingQueue;
+        private object _lock = new object();
+        private static Logger loggerAPI;
         public readonly object _instanceLock = new();
-        
-        public LoggerAPI GetInstance()
+
+        public Logger()
+        {
+            ConcurrentQueue = new ConcurrentQueue<BallLoggerAPI>();
+            BlockingQueue = new BlockingCollection<BallLoggerAPI> (ConcurrentQueue, maxQueue);
+            Task.Run(() => WriteToJson());
+        }
+
+        public Logger GetInstance()
         {
             lock (_instanceLock)
             {
@@ -21,24 +31,8 @@ namespace Data
                 return loggerAPI;
             }
         }
-    }
 
-    internal class Logger : LoggerAPI
-    {
-        private readonly int maxQueue = 1500;
-        private bool IsQueueFull = false;
-        ConcurrentQueue<BallLoggerAPI> ConcurrentQueue;
-        private BlockingCollection<BallLoggerAPI> BlockingQueue;
-        private object _lock = new object();
-
-        public Logger()
-        {
-            ConcurrentQueue = new ConcurrentQueue<BallLoggerAPI>();
-            BlockingQueue = new BlockingCollection<BallLoggerAPI> (ConcurrentQueue, maxQueue);
-            Task.Run(() => WriteToJson());
-        }
-
-        public override void AddBallToQueue(DataAbstractAPI ball, DateTime dateTime)
+        public void AddBallToQueue(DataAbstractAPI ball, DateTime dateTime)
         {
             lock (_lock)
             {
@@ -54,7 +48,7 @@ namespace Data
             }
         }
 
-        public override void WriteToJson()
+        public void WriteToJson()
         {
             Task.Run(async () => {
                 using StreamWriter streamWriter = new(Path.Combine(Environment.CurrentDirectory, "log.json"));

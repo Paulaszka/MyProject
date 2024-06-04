@@ -62,7 +62,7 @@ namespace Data
         private int id;
         private IPosition position;
         private Vector2 velocity;
-        private LoggerAPI loggerAPI;
+        private Logger loggerAPI;
 
         public Ball(int _id, IPosition _position, Vector2 _velocity)
         {
