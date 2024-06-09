@@ -117,13 +117,6 @@ namespace Data
             }
         }
 
-        //private void BallMove()
-        //{
-        //    BallPosition.SetPosition(BallPosition.X + Velocity.X, BallPosition.Y + Velocity.Y);
-        //    NotifyObservers(this);
-        //    loggerAPI.AddBallToQueue(this, DateTime.Now);
-        //}
-
         public override void BallCreateMovementTask()
         {
             stop = false;

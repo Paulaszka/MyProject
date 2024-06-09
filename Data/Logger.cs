@@ -54,17 +54,15 @@ namespace Data
                 using StreamWriter streamWriter = new(Path.Combine(Environment.CurrentDirectory, "log.json"));
                 while (true)
                 {
-                    while (BlockingQueue.TryTake(out BallLoggerAPI removedBall))
-                    {
-                        string log = JsonSerializer.Serialize(removedBall);
-                        await streamWriter.WriteLineAsync(log);
-                    }
-
                     if (IsQueueFull)
                     {
                         await streamWriter.WriteLineAsync("Buffer is filled");
                         IsQueueFull = false;
                     }
+
+                    BallLoggerAPI RemovedBall = BlockingQueue.Take();
+                    string log = JsonSerializer.Serialize(RemovedBall);
+                    await streamWriter.WriteLineAsync(log);
                     await streamWriter.FlushAsync();
                 }
             });
