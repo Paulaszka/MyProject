@@ -58,7 +58,7 @@ namespace Model
             {
                 lock (_lock)
                 {
-                    Vector2 vector = new(2, 2);
+                    Vector2 vector = new(5,5);
                     BallModelAPI ball = BallModelAPI.CreateApi(ballPositions[i][0], ballPositions[i][1], vector);
                     modelBallsCollection.Add(ball);
                 }

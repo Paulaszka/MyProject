@@ -59,7 +59,7 @@ namespace Logic
         {
             for (int i = 0; i < balls.Count; i++)
             {
-                GetBall(i).BallCreateMovementTask(30);
+                GetBall(i).BallCreateMovementTask();
             }
         }
 

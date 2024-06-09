@@ -9,7 +9,7 @@ namespace Data
         public abstract IPosition BallPosition { get; set; }
         public abstract Vector2 Velocity { get; set; }
 
-        public abstract void BallCreateMovementTask(int interval);
+        public abstract void BallCreateMovementTask();
         public abstract void BallStop();
         public abstract IDisposable Subscribe(IObserver<DataAbstractAPI> observer);
 
@@ -117,17 +117,17 @@ namespace Data
             }
         }
 
-        private void BallMove()
-        {
-            BallPosition.SetPosition(BallPosition.X + Velocity.X, BallPosition.Y + Velocity.Y);
-            NotifyObservers(this);
-            loggerAPI.AddBallToQueue(this, DateTime.Now);
-        }
+        //private void BallMove()
+        //{
+        //    BallPosition.SetPosition(BallPosition.X + Velocity.X, BallPosition.Y + Velocity.Y);
+        //    NotifyObservers(this);
+        //    loggerAPI.AddBallToQueue(this, DateTime.Now);
+        //}
 
-        public override void BallCreateMovementTask(int interval)
+        public override void BallCreateMovementTask()
         {
             stop = false;
-            task = Run(interval);
+            task = Run();
         }
 
         public override void BallStop()
@@ -135,19 +135,31 @@ namespace Data
             stop = true;
         }
 
-        private async Task Run(int interval)
+        private async Task Run()
         {
-            while (!stop)
+            float lastUpdateTime = 0f;
+            stopwatch.Start();
+            while (true)
             {
-                stopwatch.Reset();
-                stopwatch.Start();
-                if (!stop)
+                float currentTime = (float)stopwatch.Elapsed.TotalSeconds;
+                float delta = currentTime - lastUpdateTime;
+                const float timeOfTravel = 1f / 60f;
+
+                if (delta >= timeOfTravel)
                 {
-                    BallMove();
+                    lastUpdateTime = currentTime;
+                    BallPosition.SetPosition(BallPosition.X + Velocity.X, BallPosition.Y + Velocity.Y);
+                    NotifyObservers(this);
+                    loggerAPI.AddBallToQueue(this, DateTime.Now);
                 }
-                stopwatch.Stop();
-                await Task.Delay((int)(interval - stopwatch.ElapsedMilliseconds));
-            }
+
+                if (stop)
+                {
+                    stopwatch.Stop();
+                    break;
+                }
+                await Task.Delay(TimeSpan.FromSeconds(timeOfTravel));
+            } 
         }
 
         public override IDisposable Subscribe(IObserver<DataAbstractAPI> observer)
